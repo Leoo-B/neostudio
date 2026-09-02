@@ -10,14 +10,29 @@ const CACHE_TTL_MS = 60_000 // 1 menit cache untuk endpoint tanpa parameter dina
 const buckets = new Map<string, { count: number; resetAt: number }>()
 const cache = new Map<string, { at: number; body: ArrayBuffer; contentType: string; status: number }>()
 
-function getClientIp(c: Context): string {
+// injectable untuk testing
+let _fetch: typeof fetch = fetch
+let _now: () => number = () => Date.now()
+export function _setFetchForTest(f: typeof fetch) {
+  _fetch = f
+}
+export function _setNowForTest(n: () => number) {
+  _now = n
+}
+export function _resetForTest() {
+  buckets.clear()
+  cache.clear()
+  _fetch = fetch
+  _now = () => Date.now()
+}
+
+export function getClientIp(c: Context): string {
   const xf = c.req.header("x-forwarded-for")
   if (xf) return xf.split(",")[0].trim()
   return c.req.header("x-real-ip") ?? "anon"
 }
 
-function checkRate(ip: string): boolean {
-  const now = Date.now()
+export function checkRate(ip: string, now: number = _now()): boolean {
   const b = buckets.get(ip)
   if (!b || now > b.resetAt) {
     buckets.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
@@ -28,7 +43,7 @@ function checkRate(ip: string): boolean {
   return true
 }
 
-function buildQuery(params: Record<string, unknown>): string {
+export function buildQuery(params: Record<string, unknown>): string {
   const usp = new URLSearchParams()
   for (const [k, v] of Object.entries(params)) {
     if (v === undefined || v === null || v === "") continue
@@ -64,7 +79,7 @@ async function callUpstream(t: (typeof TOOLS)[number], method: "GET" | "POST", p
   const ctrl = new AbortController()
   const timer = setTimeout(() => ctrl.abort(), TOOL_TIMEOUT_MS)
   try {
-    const res = await fetch(url, { ...init, signal: ctrl.signal, headers: { "User-Agent": "neostudio-proxy/1.0", ...(init.headers ?? {}) } })
+    const res = await _fetch(url, { ...init, signal: ctrl.signal, headers: { "User-Agent": "neostudio-proxy/1.0", ...(init.headers ?? {}) } })
     const arrayBuf = await res.arrayBuffer()
     return {
       body: arrayBuf,
