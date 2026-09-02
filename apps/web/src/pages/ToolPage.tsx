@@ -30,14 +30,14 @@ export default function ToolPage() {
   const toast = useToast()
 
   const query = useQuery({
-    queryKey: ["run", tool?.id, params],
+    queryKey: ["run", tool?.id, JSON.stringify(params)],
     queryFn: () => runTool(tool!.id, params),
     enabled: !!tool && submitted,
   })
 
   useEffect(() => {
-    if (query.isSuccess) toast(`${tool?.name ?? "Tool"} berhasil dijalankan`)
-  }, [query.isSuccess, toast, tool?.name])
+    if (query.isSuccess) toast(`${tool?.id ?? "Tool"} berhasil dijalankan`)
+  }, [query.isSuccess, tool?.id, toast])
 
   if (!tool) {
     return (
@@ -62,8 +62,8 @@ export default function ToolPage() {
     <div className="min-h-dvh bg-bg">
       <Header />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
-        <Link to="/c/$id" params={{ id: tool.category }} className="inline-flex items-center gap-1 text-sm text-muted-fg hover:text-cream transition-colors duration-150 mb-6">
-          ← Kembali ke kategori
+        <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-fg hover:text-cream transition-colors duration-150 mb-6">
+          ← Kembali ke home
         </Link>
 
         <h1 className="font-head text-3xl sm:text-4xl mb-1">{tool.name}</h1>

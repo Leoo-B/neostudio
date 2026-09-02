@@ -1,6 +1,5 @@
 import { createRootRoute, createRoute, Outlet } from "@tanstack/react-router"
 import HomePage from "./pages/HomePage"
-import CategoryPage from "./pages/CategoryPage"
 import ToolPage from "./pages/ToolPage"
 
 const rootRoute = createRootRoute({
@@ -21,16 +20,10 @@ export const indexRoute = createRoute({
   component: HomePage,
 })
 
-export const categoryRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/c/$id",
-  component: CategoryPage,
-})
-
 export const toolRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/tool/$id",
   component: ToolPage,
 })
 
-export const routeTree = rootRoute.addChildren([indexRoute, categoryRoute, toolRoute])
+export const routeTree = rootRoute.addChildren([indexRoute, toolRoute])
