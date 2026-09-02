@@ -1,5 +1,4 @@
-import { createRootRoute, createRoute, Outlet, useNavigate, useParams } from "@tanstack/react-router"
-import { CATEGORIES } from "@neostudio/shared"
+import { createRootRoute, createRoute, Outlet } from "@tanstack/react-router"
 import HomePage from "./pages/HomePage"
 import CategoryPage from "./pages/CategoryPage"
 import ToolPage from "./pages/ToolPage"
