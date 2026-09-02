@@ -1,12 +1,13 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Link, useParams } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
 import { TOOLS, type ToolDef, type ApiResponse } from "@neostudio/shared"
 import { Header, Footer } from "./HomePage"
+import { useToast } from "../components/Toast"
+import { SuccessCheck } from "../components/SuccessCheck"
 import {
   ArrowDownTrayIcon,
   ClipboardDocumentIcon,
-  CheckCircleIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline"
 
@@ -26,12 +27,17 @@ export default function ToolPage() {
   const tool = TOOLS.find((t) => t.id === id)
   const [params, setParams] = useState<Record<string, string>>({})
   const [submitted, setSubmitted] = useState(false)
+  const toast = useToast()
 
   const query = useQuery({
     queryKey: ["run", tool?.id, params],
     queryFn: () => runTool(tool!.id, params),
     enabled: !!tool && submitted,
   })
+
+  useEffect(() => {
+    if (query.isSuccess) toast(`${tool?.name ?? "Tool"} berhasil dijalankan`)
+  }, [query.isSuccess, toast, tool?.name])
 
   if (!tool) {
     return (
@@ -96,7 +102,9 @@ export default function ToolPage() {
           </div>
         )}
 
-        {query.data && <ResultView tool={tool} res={query.data} />}
+        <div className={`t-panel ${query.data ? "is-open" : ""}`}>
+          {query.data && <ResultView tool={tool} res={query.data} />}
+        </div>
       </main>
       <Footer />
     </div>
@@ -133,9 +141,19 @@ function Field({ field, value, onChange }: { field: ToolDef["fields"][number]; v
 }
 
 function ResultView({ tool, res }: { tool: ToolDef; res: ApiResponse }) {
+  const [showCheck, setShowCheck] = useState(false)
+  useEffect(() => {
+    setShowCheck(false)
+    const t = requestAnimationFrame(() => setShowCheck(true))
+    return () => cancelAnimationFrame(t)
+  }, [res])
+
   return (
     <section aria-label="Hasil" className="mt-6">
-      <h2 className="font-head text-xl mb-3">Hasil</h2>
+      <div className="flex items-center gap-2 mb-3">
+        <SuccessCheck show={showCheck} />
+        <h2 className="font-head text-xl">Hasil</h2>
+      </div>
       {res.kind === "image" && res.imageUrl ? (
         <div className="nb-card p-4">
           <a href={res.imageUrl} download={`${tool.id}.png`} className="nb-btn inline-flex items-center gap-2 mb-4">
@@ -156,16 +174,18 @@ function ResultView({ tool, res }: { tool: ToolDef; res: ApiResponse }) {
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
+  const toast = useToast()
   return (
     <button
       onClick={() => {
         void navigator.clipboard.writeText(text)
         setCopied(true)
+        toast("Disalin ke clipboard")
         setTimeout(() => setCopied(false), 1200)
       }}
       className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 border-2 border-line hover:bg-muted transition-colors duration-150 cursor-pointer"
     >
-      {copied ? <CheckCircleIcon className="w-4 h-4 text-cream" /> : <ClipboardDocumentIcon className="w-4 h-4" />}
+      <ClipboardDocumentIcon className="w-4 h-4" />
       {copied ? "Tersalin!" : "Salin"}
     </button>
   )

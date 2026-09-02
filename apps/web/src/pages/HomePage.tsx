@@ -47,39 +47,39 @@ export default function HomePage() {
       <main className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
         {/* HERO */}
         <section className="pt-16 pb-10 text-center">
-          <div className="inline-block nb-card px-4 py-1 mb-6">
-            <span className="text-[11px] font-mono uppercase tracking-widest text-cream">64 tools · 8 kategori · gratis</span>
-          </div>
-          <h1 className="font-head text-4xl sm:text-6xl leading-tight">
-            neostudio
-          </h1>
-          <p className="mt-3 text-muted-fg text-base sm:text-lg max-w-xl mx-auto">
-            Satu situs, banyak alat. Tanpa daftar, tanpa iklan popup. Pilih tool, isi input, dapat hasil.
-          </p>
-          <div className="mt-8 max-w-xl mx-auto relative">
-            <MagnifyingGlassIcon className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-muted-fg pointer-events-none" />
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Cari tool… (mis. tiktok, qr, zodiak)"
-              className="nb-input pl-12"
-              aria-label="Cari tool"
-            />
-            {filtered.length > 0 && (
-              <div className="absolute z-20 mt-2 w-full nb-card p-2 max-h-72 overflow-auto">
-                {filtered.map((t) => (
-                  <Link
-                    key={t.id}
-                    to="/tool/$id"
-                    params={{ id: t.id }}
-                    className="flex items-center justify-between px-3 py-2 text-sm hover:bg-muted hover:text-cream transition-colors duration-150"
-                  >
-                    <span>{t.name}</span>
-                    <ChevronRightIcon className="w-4 h-4 text-muted-fg" />
-                  </Link>
-                ))}
-              </div>
-            )}
+          <div className="t-stagger is-shown">
+            <div className="t-stagger-line t-stagger-line--1 inline-block nb-card px-4 py-1 mb-6">
+              <span className="text-[11px] font-mono uppercase tracking-widest text-cream">64 tools · 8 kategori · gratis</span>
+            </div>
+            <h1 className="font-head text-4xl sm:text-6xl leading-tight t-stagger-line t-stagger-line--2">neostudio</h1>
+            <p className="mt-3 text-muted-fg text-base sm:text-lg max-w-xl mx-auto t-stagger-line t-stagger-line--3">
+              Satu situs, banyak alat. Tanpa daftar, tanpa iklan popup. Pilih tool, isi input, dapat hasil.
+            </p>
+            <div className="mt-8 max-w-xl mx-auto relative t-stagger-line t-stagger-line--4">
+              <MagnifyingGlassIcon className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-muted-fg pointer-events-none" />
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Cari tool… (mis. tiktok, qr, zodiak)"
+                className="nb-input pl-12"
+                aria-label="Cari tool"
+              />
+              {filtered.length > 0 && (
+                <div className="absolute z-20 mt-2 w-full nb-card p-2 max-h-72 overflow-auto">
+                  {filtered.map((t) => (
+                    <Link
+                      key={t.id}
+                      to="/tool/$id"
+                      params={{ id: t.id }}
+                      className="flex items-center justify-between px-3 py-2 text-sm hover:bg-muted hover:text-cream transition-colors duration-150"
+                    >
+                      <span>{t.name}</span>
+                      <ChevronRightIcon className="w-4 h-4 text-muted-fg" />
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
@@ -107,16 +107,18 @@ export default function HomePage() {
             <h2 className="font-head text-2xl">Kategori</h2>
             <span className="nb-chip font-mono">8 kategori</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="t-stagger is-shown grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {CATEGORIES.map((cat) => {
               const Icon = ICONS[cat.icon] ?? WrenchScrewdriverIcon
               const count = TOOLS.filter((t) => t.category === cat.id).length
+              const idx = CATEGORIES.indexOf(cat)
+              const staggerCls = `t-stagger-line t-stagger-line--${Math.min(idx + 1, 4)}`
               return (
                 <Link
                   key={cat.id}
                   to="/c/$id"
                   params={{ id: cat.id }}
-                  className="nb-card block p-5 cursor-pointer"
+                  className={`nb-card block p-5 cursor-pointer ${staggerCls}`}
                 >
                   <div className="w-12 h-12 grid place-items-center border-2 border-line bg-altar mb-4">
                     <Icon className="w-6 h-6 text-cream" />
