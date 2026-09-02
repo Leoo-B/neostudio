@@ -1,162 +1,149 @@
-# Design System Master File
+# Design System — neostudio
 
-> **LOGIC:** When building a specific page, first check `design-system/pages/[page-name].md`.
+> **LOGIC:** When building a page, first check `design-system/pages/[page].md`.
 > If that file exists, its rules **override** this Master file.
 > If not, strictly follow the rules below.
 
 ---
 
 **Project:** neostudio
-**Generated:** 2026-09-02 10:35:57
-**Category:** Developer Tool / IDE
+**Generated:** 2026-09-02
+**Category:** Developer Tool / Multi-tool Platform ("Swiss Army Knife")
 
 ---
 
 ## Global Rules
 
+### Style: Dark Neobrutalism
+
+Kombinasi dark mode (OLED-friendly) dengan estetika neobrutalism modern:
+bg hitam pekat, border tebal putih/krem solid, shadow keras tanpa blur (hard offset), sudut siku/geometrik, warna aksen cream. **Tanpa emoji** sebagai ikon — wajib SVG modern (Heroicons).
+
+**Keywords:** dark, OLED, hard shadow, thick border, punchy, bold, geometric, cream accent, high contrast, playful-but-functional
+
 ### Color Palette
 
 | Role | Hex | CSS Variable |
 |------|-----|--------------|
-| Primary | `#1E293B` | `--color-primary` |
-| On Primary | `#FFFFFF` | `--color-on-primary` |
-| Secondary | `#334155` | `--color-secondary` |
-| On Secondary | `#FFFFFF` | `--color-on-secondary` |
-| Accent/CTA | `#22C55E` | `--color-accent` |
-| On Accent/CTA | `#0F172A` | `--color-on-accent` |
-| Background | `#0F172A` | `--color-background` |
-| Foreground | `#F8FAFC` | `--color-foreground` |
-| Card | `#1B2336` | `--color-card` |
-| Card Foreground | `#F8FAFC` | `--color-card-foreground` |
-| Muted | `#272F42` | `--color-muted` |
-| Muted Foreground | `#94A3B8` | `--color-muted-foreground` |
-| Border | `#475569` | `--color-border` |
-| Destructive | `#EF4444` | `--color-destructive` |
-| On Destructive | `#000000` | `--color-on-destructive` |
-| Ring | `#FFFFFF` | `--color-ring` |
+| Background | `#0B0B0F` | `--color-background` |
+| Background Alt | `#111117` | `--color-bg-alt` |
+| Foreground | `#F7F5F2` | `--color-foreground` |
+| Card | `#15151C` | `--color-card` |
+| Card Foreground | `#F7F5F2` | `--color-card-foreground` |
+| Accent (CTA) | `#F5DEB3` | `--color-accent` |
+| On Accent | `#0B0B0F` | `--color-on-accent` |
+| Primary | `#F5DEB3` | `--color-primary` |
+| On Primary | `#0B0B0F` | `--color-on-primary` |
+| Secondary Border | `#F7F5F2` | `--color-secondary` |
+| Muted | `#2A2A33` | `--color-muted` |
+| Muted Foreground | `#A9A9B3` | `--color-muted-foreground` |
+| Border | `#F7F5F2` (solid 2px) | `--color-border` |
+| Destructive | `#F8716F` | `--color-destructive` |
+| On Destructive | `#0B0B0F` | `--color-on-destructive` |
+| Ring / Focus | `#F5DEB3` | `--color-ring` |
 
-**Color Notes:** Code dark + run green
+**Color Notes:** Dark pekat + cream berpendar pengganti neon. Border putih/krem tebal solid (2px) — ciri neobrutalism.
 
 ### Typography
 
-- **Heading Font:** JetBrains Mono
-- **Body Font:** IBM Plex Sans
-- **Mood:** code, developer, technical, precise, functional, hacker
-- **Google Fonts:** [JetBrains Mono + IBM Plex Sans](https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap)
-
-**CSS Import:**
+- **Heading Font:** Space Grotesk (geometris, bold, modern)
+- **Body Font:** Inter (bersih, mudah dibaca)
+- **Mono (kode/JSON):** JetBrains Mono
+- **Mood:** modern, bold, geometric, developer, punchy
+- **Google Fonts:**
 ```css
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 ```
 
-### Spacing Variables
+### Spacing
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `--space-xs` | `4px` / `0.25rem` | Tight gaps |
-| `--space-sm` | `8px` / `0.5rem` | Icon gaps, inline spacing |
-| `--space-md` | `16px` / `1rem` | Standard padding |
-| `--space-lg` | `24px` / `1.5rem` | Section padding |
-| `--space-xl` | `32px` / `2rem` | Large gaps |
-| `--space-2xl` | `48px` / `3rem` | Section margins |
-| `--space-3xl` | `64px` / `4rem` | Hero padding |
+| `--space-xs` | `4px` / `.25rem` | tight gaps |
+| `--space-sm` | `8px` / `.5rem` | icon gaps |
+| `--space-md` | `16px` / `1rem` | standard padding |
+| `--space-lg` | `24px` / `1.5rem` | section padding |
+| `--space-xl` | `32px` / `2rem` | large gaps |
+| `--space-2xl` | `48px` / `3rem` | section margins |
+| `--space-3xl` | `64px` / `4rem` | hero padding |
 
-### Shadow Depths
+### Neobrutalism Signature (border + hard shadow)
 
-| Level | Value | Usage |
-|-------|-------|-------|
-| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.05)` | Subtle lift |
-| `--shadow-md` | `0 4px 6px rgba(0,0,0,0.1)` | Cards, buttons |
-| `--shadow-lg` | `0 10px 15px rgba(0,0,0,0.1)` | Modals, dropdowns |
-| `--shadow-xl` | `0 20px 25px rgba(0,0,0,0.15)` | Hero images, featured cards |
+```css
+:root {
+  --border-w: 2px;
+  --border-color: #F7F5F2;
+  --shadow-hard: 4px 4px 0 0 #F5DEB3;   /* hard offset, no blur */
+  --shadow-hard-sm: 3px 3px 0 0 #F5DEB3;
+  --radius: 0px;                          /* sudut siku (atau 8px jika minta) */
+}
+```
+
+Rule: **tanpa blur shadow**, tebal jelas, warna aksen cream sebagai shadow di atas hitam.
 
 ---
 
 ## Component Specs
 
-### Buttons
-
+### Button (primary)
 ```css
-/* Primary Button */
 .btn-primary {
-  background: #22C55E;
-  color: white;
+  background: #F5DEB3;        /* cream */
+  color: #0B0B0F;
+  border: 2px solid #F7F5F2;
+  border-radius: 0;           /* siku */
   padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 200ms ease;
+  font-weight: 700;
+  box-shadow: 4px 4px 0 0 #F7F5F2;
   cursor: pointer;
+  transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 150ms;
 }
-
-.btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-/* Secondary Button */
-.btn-secondary {
-  background: transparent;
-  color: #1E293B;
-  border: 2px solid #1E293B;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 200ms ease;
-  cursor: pointer;
-}
+.btn-primary:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 0 #F7F5F2; }
+.btn-primary:active { transform: translate(2px,2px); box-shadow: 0 0 0 0 #F7F5F2; }
 ```
 
-### Cards
-
+### Card (tool / kategori)
 ```css
 .card {
-  background: #0F172A;
-  border-radius: 12px;
+  background: #15151C;
+  border: 2px solid #F7F5F2;
+  border-radius: 0;
   padding: 24px;
-  box-shadow: var(--shadow-md);
-  transition: all 200ms ease;
+  box-shadow: 4px 4px 0 0 #F5DEB3;   /* cream hard shadow */
   cursor: pointer;
+  transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 150ms;
 }
-
-.card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
-}
+.card:hover { transform: translate(-3px,-3px); box-shadow: 7px 7px 0 0 #F5DEB3; }
 ```
 
-### Inputs
-
+### Input
 ```css
 .input {
+  background: #111117;
+  color: #F7F5F2;
+  border: 2px solid #F7F5F2;
+  border-radius: 0;
   padding: 12px 16px;
-  border: 1px solid #E2E8F0;
-  border-radius: 8px;
   font-size: 16px;
-  transition: border-color 200ms ease;
 }
 
 .input:focus {
-  border-color: #1E293B;
   outline: none;
-  box-shadow: 0 0 0 3px #1E293B20;
+  border-color: #F5DEB3;
+  box-shadow: 3px 3px 0 0 #F5DEB3;
 }
 ```
 
-### Modals
-
+### Tag/Chip
 ```css
-.modal-overlay {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-}
-
-.modal {
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: var(--shadow-xl);
-  max-width: 500px;
-  width: 90%;
+.chip {
+  background: #111117;
+  border: 2px solid #F7F5F2;
+  color: #F7F5F2;
+  padding: 4px 12px;
+  font-weight: 600;
+  box-shadow: 2px 2px 0 0 #F5DEB3;
+  cursor: pointer;
 }
 ```
 
@@ -164,51 +151,43 @@
 
 ## Style Guidelines
 
-**Style:** Dark Mode (OLED)
+**Style: Dark Neobrutalism** — bg `#0B0B0F`, card `#15151C`, border putih `#F7F5F2` (2px solid), hard shadow cream `#F5DEB3` (4px offset, **tanpa blur**), sudut siku.
 
-**Keywords:** Dark theme, low light, high contrast, deep black, midnight blue, eye-friendly, OLED, night mode, power efficient
-
-**Best For:** Night-mode apps, coding platforms, entertainment, eye-strain prevention, OLED devices, low-light
-
-**Key Effects:** Minimal glow (text-shadow: 0 0 10px), dark-to-light transitions, low white emission, high readability, visible focus
+**Key Effects (dari transitions-dev / transitions-polish):**
+- Hovernya `translate(-2px,-2px)` + shadow membesar — kesan "diangkat" khas neobrutalism
+- Transisi 150-300ms, easing `cubic-bezier(0.22,1,0.36,1)` (smooth-out)
+- Gunakan motion tokens dari `transitions-polish/_root.css` (salon di repo root)
 
 ### Page Pattern
 
-**Pattern Name:** FAQ/Documentation Landing
-
-- **Conversion Strategy:** Reduce support tickets. Track search analytics. Show related articles. Contact escalation path.
-- **CTA Placement:** Search bar prominent + Contact CTA for unresolved questions
-- **Section Order:** Hero with search bar > Popular categories > FAQ accordion > Contact/support CTA
+**Pattern: Dashboard / Toolbox Launchpad**
+- **CTA:** Kotak pencarian besar + 8 kartu kategori
+- **Section order:** Hero (logo + tagline + search) → "cara pakai" strip (3-4 langkah) → grid 8 kategori → tool populer
+- **Anti-pattern dilarang:** emoji sebagai ikon (pakai Heroicons SVG), shadow blur terlalu lembut, gradient neon, layout shift saat hover
 
 ---
 
 ## Anti-Patterns (Do NOT Use)
 
+- ❌ Emojis as icons — wajib SVG (Heroicons)
+- ❌ Neon/bright gradients — ganti dengan cream `#F5DEB3` + hard shadow
+- ❌ Soft feathery shadows — ganti hard offset shadow
+- ❌ Rounded corners berlebihan (kecuali diminta) — default sudut siku
 - ❌ Light mode default
-- ❌ Slow performance
-
-### Additional Forbidden Patterns
-
-- ❌ **Emojis as icons** — Use SVG icons (Heroicons, Lucide, Simple Icons)
-- ❌ **Missing cursor:pointer** — All clickable elements must have cursor:pointer
-- ❌ **Layout-shifting hovers** — Avoid scale transforms that shift layout
-- ❌ **Low contrast text** — Maintain 4.5:1 minimum contrast ratio
-- ❌ **Instant state changes** — Always use transitions (150-300ms)
-- ❌ **Invisible focus states** — Focus states must be visible for a11y
+- ❌ Missing `cursor:pointer` pada elemen klik
+- ❌ Low contrast text — min 4.5:1
+- ❌ Instan state change tanpa transisi — selalu 150-300ms
 
 ---
 
 ## Pre-Delivery Checklist
 
-Before delivering any UI code, verify:
-
-- [ ] No emojis used as icons (use SVG instead)
-- [ ] All icons from consistent icon set (Heroicons/Lucide)
-- [ ] `cursor-pointer` on all clickable elements
-- [ ] Hover states with smooth transitions (150-300ms)
-- [ ] Light mode: text contrast 4.5:1 minimum
-- [ ] Focus states visible for keyboard navigation
-- [ ] `prefers-reduced-motion` respected
-- [ ] Responsive: 375px, 768px, 1024px, 1440px
-- [ ] No content hidden behind fixed navbars
+- [ ] No emojis as icons (pakai Heroicons SVG)
+- [ ] `cursor-pointer` pada semua elemen klik
+- [ ] Hard offset shadow (`-px`, no blur), border tebal 2px
+- [ ] Hover `translate` + shadow membesar, 150-300ms
+- [ ] `prefers-reduced-motion` dihormati (guard di semua transition)
+- [ ] text contrast ≥ 4.5:1
+- [ ] Focus states visible (ring cream `#F5DEB3`)
+- [ ] Responsive: 375 / 768 / 1024 / 1440 px
 - [ ] No horizontal scroll on mobile

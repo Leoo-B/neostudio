@@ -1,0 +1,154 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* transitions-polish — motion tokens (copy dari root monorepo) */
+:root {
+  --duration-stagger: 40ms;
+  --duration-micro: 80ms;
+  --duration-quick: 150ms;
+  --duration-fast: 250ms;
+  --duration-medium: 350ms;
+  --duration-slow: 400ms;
+  --duration-very-slow: 500ms;
+  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: ease-in-out;
+  --ease-out: ease-out;
+  --ease-linear: linear;
+  --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  background: #0b0b0f;
+  color: #f7f5f2;
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: "JetBrains Mono", monospace;
+}
+
+/* neobrutalism primitives */
+.nb-card {
+  background: #15151c;
+  border: 2px solid #f7f5f2;
+  box-shadow: 4px 4px 0 0 #f5deb3;
+  transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 150ms;
+}
+.nb-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 7px 7px 0 0 #f5deb3;
+}
+.nb-card:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 0 #f5deb3;
+}
+
+.nb-btn {
+  background: #f5deb3;
+  color: #0b0b0f;
+  border: 2px solid #f7f5f2;
+  box-shadow: 4px 4px 0 0 #f7f5f2;
+  font-weight: 700;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 150ms;
+}
+.nb-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 0 #f7f5f2;
+}
+.nb-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 0 #f7f5f2;
+}
+.nb-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 2px 2px 0 0 #2a2a33;
+}
+
+.nb-input {
+  background: #111117;
+  color: #f7f5f2;
+  border: 2px solid #f7f5f2;
+  padding: 12px 16px;
+  width: 100%;
+  font-size: 16px;
+  transition: border-color 150ms, box-shadow 150ms;
+}
+.nb-input:focus {
+  outline: none;
+  border-color: #f5deb3;
+  box-shadow: 3px 3px 0 0 #f5deb3;
+}
+
+.nb-chip {
+  background: #111117;
+  border: 2px solid #f7f5f2;
+  color: #f7f5f2;
+  padding: 4px 12px;
+  font-weight: 600;
+  box-shadow: 2px 2px 0 0 #f5deb3;
+  font-size: 0.75rem;
+  display: inline-block;
+}
+
+.nb-skeleton {
+  background: linear-gradient(90deg, #15151c 0%, #2a2a33 50%, #15151c 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.nb-error-shake {
+  animation: shake 350ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+  40%, 60% { transform: translate3d(3px, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* smooth focus ring (keyboard only) */
+:focus-visible {
+  outline: 2px solid #f5deb3;
+  outline-offset: 2px;
+}
