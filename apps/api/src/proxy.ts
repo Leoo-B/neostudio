@@ -91,6 +91,28 @@ async function callUpstream(t: (typeof TOOLS)[number], method: "GET" | "POST", p
   }
 }
 
+const ERROR_HINTS = /fail|cannot|request.*error|status code \d{3}|error\d{1,2}|denied|unreachable|tidak dapat|diambil|ditemukan|tidak ada/i
+
+/** deteksi kegagalan terselubung: HTTP 200 tapi payload bilang error */
+function softError(data: unknown): string | null {
+  const obj = (data ?? {}) as Record<string, unknown>
+  if (obj.status === false || obj.success === false) {
+    const m = String(obj.error ?? obj.message ?? obj.msg ?? "").trim()
+    return m || "Upstream menolak permintaan"
+  }
+  const d = obj.data
+  if (typeof d === "string" && ERROR_HINTS.test(d) && d.length < 300) return d
+  if (d && typeof d === "object") {
+    const dd = d as Record<string, unknown>
+    const result = dd.result
+    if (typeof result === "string" && ERROR_HINTS.test(result)) return result
+    if (dd.status === false) {
+      return String(dd.error ?? dd.message ?? "").trim() || "Upstream menolak permintaan"
+    }
+  }
+  return null
+}
+
 function normalize(t: (typeof TOOLS)[number], ct: string, body: ArrayBuffer, status: number) {
   const isImage = ct.startsWith("image/")
   const isJson = ct.includes("json")
@@ -111,7 +133,14 @@ function normalize(t: (typeof TOOLS)[number], ct: string, body: ArrayBuffer, sta
     } catch {
       data = Buffer.from(body).toString("utf8")
     }
-    return { ok: status >= 200 && status < 300, status, kind: "json" as const, data }
+    const softErr = softError(data)
+    return {
+      ok: status >= 200 && status < 300 && !softErr,
+      status,
+      kind: "json" as const,
+      data,
+      ...(softErr ? { error: softErr } : {}),
+    }
   }
   return {
     ok: status >= 200 && status < 300,

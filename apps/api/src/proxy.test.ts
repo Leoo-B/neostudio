@@ -189,4 +189,32 @@ describe("proxyTool — normalisasi", () => {
     expect(r.body.kind).toBe("json")
     expect(typeof r.body.data).toBe("string")
   })
+
+  it("soft-error: HTTP 200 tapi {success:true, data:{result:'error1'}} → ok=false", async () => {
+    _setFetchForTest(
+      async () =>
+        new Response(JSON.stringify({ success: true, data: { result: "error1" }, creator: "X" }), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        }) as never
+    )
+    const c = fakeCtx("all-dl", { url: "https://x" }, "9.9.9.9")
+    const r = (await proxyTool(c, "GET", { url: "https://x" })) as any
+    expect(r.body.ok).toBe(false)
+    expect(r.body.error).toBe("error1")
+  })
+
+  it("soft-error: status:false dengan message → ok=false + pesan", async () => {
+    _setFetchForTest(
+      async () =>
+        new Response(JSON.stringify({ status: false, error: "Parameter 'url' wajib diisi" }), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        }) as never
+    )
+    const c = fakeCtx("tiktok", { url: "https://x" }, "10.0.0.1")
+    const r = (await proxyTool(c, "GET", { url: "https://x" })) as any
+    expect(r.body.ok).toBe(false)
+    expect(r.body.error).toContain("wajib diisi")
+  })
 })
