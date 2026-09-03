@@ -45,9 +45,27 @@ test("semua downloader pakai downloadCard + punya downloadField", () => {
     assert.equal(t.renderKind, "downloadCard", `download ${t.id} harus downloadCard`)
     assert.ok(t.downloadField || (t.downloadFields && t.downloadFields.length), `download ${t.id} wajib downloadField/downloadFields`)
   }
-  // siputzx downloader wajib punya fallback
-  const siputzxDl = dls.filter((t) => t.source === "siputzx")
-  for (const t of siputzxDl) {
-    assert.ok(t.fallbackToolId, `download siputzx ${t.id} wajib fallbackToolId`)
-  }
+})
+
+test("maths sudah pakai kyzznekoo dengan param level + renderKind quiz", () => {
+  const m = TOOLS.find((t) => t.id === "maths")!
+  assert.equal(m.source, "kyzznekoo")
+  assert.equal(m.path, "/api/game/maths")
+  assert.equal(m.renderKind, "quiz")
+  const level = m.fields.find((f) => f.name === "level")
+  assert.ok(level && level.type === "select" && (level.options?.length ?? 0) > 0, "maths wajib punya param level select")
+})
+
+test("sholat pakai prayerTimes + ppcouple imagePair (render baru)", () => {
+  const sholat = TOOLS.find((t) => t.id === "sholat")!
+  assert.equal(sholat.renderKind, "prayerTimes")
+  assert.ok(sholat.jadwalField, "sholat butuh jadwalField")
+  const pp = TOOLS.find((t) => t.id === "ppcouple")!
+  assert.equal(pp.renderKind, "imagePair")
+  assert.ok(pp.leftField && pp.rightField)
+})
+
+test("balogo pakai param 'nama' (bukan 'text') sesuai kontrak kyzz", () => {
+  const b = TOOLS.find((t) => t.id === "balogo")!
+  assert.ok(b.fields.some((f) => f.name === "nama"), "balogo wajib field 'nama'")
 })

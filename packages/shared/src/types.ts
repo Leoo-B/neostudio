@@ -21,6 +21,9 @@ export type ToolRenderKind =
   | "keyValue"
   | "codeBlock"
   | "downloadCard"
+  | "imagePair"
+  | "prayerTimes"
+  | "quiz"
 
 export interface ToolDef {
   id: string
@@ -49,6 +52,14 @@ export interface ToolDef {
   downloadFields?: string[]
   /** downloader: field thumbnail */
   thumbnailField?: string
+  /** imagePair: dua gambar bersebelahan (mis. ppcouple cowo/cewe) */
+  leftField?: string
+  rightField?: string
+  /** prayerTimes: object berisi jam-jam sholat */
+  jadwalField?: string
+  /** quiz: soal + jawaban yang bisa dibuka */
+  questionField?: string
+  answerField?: string
   /** tool alternatif saat upstream gagal (mis. all-dl) */
   fallbackToolId?: string
   /** gunakan client-side (tanpa API) */

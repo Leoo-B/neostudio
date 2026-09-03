@@ -1,8 +1,13 @@
 import { Hono } from "hono"
 import { cors } from "hono/cors"
 import { logger } from "hono/logger"
+import dns from "node:dns"
 import { TOOLS } from "@neostudio/shared"
 import { proxyTool, warmCache } from "./proxy"
+
+// Environment ini tanpa rute IPv6 ke upstream — paksa resolve IPv4 dulu
+// agar fetch bawaan (Happy Eyeballs) tidak gagal ENETUNREACH.
+dns.setDefaultResultOrder("ipv4first")
 
 const app = new Hono()
 

@@ -59,10 +59,12 @@ export function warmCache() {
     if (t.fields.length === 0 && t.method !== "POST") {
       const cacheKey = `GET:${t.id}:`
       if (!cache.has(cacheKey)) {
-        // fire-and-forget warm
-        void callUpstream(t, "GET", {}).then((r) => {
-          if (r) cache.set(cacheKey, { ...r, at: Date.now() })
-        })
+        // fire-and-forget warm — tangani reject agar tak crash process
+        void callUpstream(t, "GET", {})
+          .then((r) => {
+            if (r) cache.set(cacheKey, { ...r, at: Date.now() })
+          })
+          .catch(() => {})
       }
     }
   }
@@ -79,7 +81,11 @@ async function callUpstream(t: (typeof TOOLS)[number], method: "GET" | "POST", p
   const ctrl = new AbortController()
   const timer = setTimeout(() => ctrl.abort(), TOOL_TIMEOUT_MS)
   try {
-    const res = await _fetch(url, { ...init, signal: ctrl.signal, headers: { "User-Agent": "neostudio-proxy/1.0", ...(init.headers ?? {}) } })
+    const res = await _fetch(url, {
+      ...init,
+      signal: ctrl.signal,
+      headers: { "User-Agent": "neostudio-proxy/1.0", ...(init.headers ?? {}) },
+    })
     const arrayBuf = await res.arrayBuffer()
     return {
       body: arrayBuf,

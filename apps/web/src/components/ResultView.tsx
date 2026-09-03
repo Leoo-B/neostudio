@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { ArrowTopRightOnSquareIcon, ArrowDownTrayIcon, ClipboardDocumentIcon, UserCircleIcon, ClipboardIcon } from "@heroicons/react/24/outline"
 import { useToast } from "./Toast"
-import { pickArr, pickPath, pickStr, toUrl } from "../lib/results"
+import { pickArr, pickPath, pickStr, toUrl, humanLabel, formatValue } from "../lib/results"
 import type { ApiResponse, ToolDef } from "@neostudio/shared"
 
 export function ResultView({ tool, res }: { tool: ToolDef; res: ApiResponse }) {
@@ -61,9 +61,15 @@ function JsonView({ tool, data }: { tool: ToolDef; data: unknown }) {
       return <QuoteCardView data={data} tool={tool} />
     case "downloadCard":
       return <DownloadCard tool={tool} data={data} />
+    case "imagePair":
+      return <ImagePairView obj={(pickPath(data, tool.resultPath) ?? data) as Record<string, unknown>} tool={tool} />
+    case "prayerTimes":
+      return <PrayerTimesView obj={(pickPath(data, tool.resultPath) ?? data) as Record<string, unknown>} tool={tool} />
+    case "quiz":
+      return <QuizView obj={(pickPath(data, tool.resultPath) ?? data) as Record<string, unknown>} tool={tool} />
     case "codeBlock":
     default:
-      return <CodeBlock data={data} />
+      return <CodeBlock data={data} tool={tool} />
   }
 }
 
@@ -104,16 +110,16 @@ function CopyButton({ text }: { text: string }) {
 function MetaChips({ obj, fields }: { obj: Record<string, unknown>; fields?: string[] }) {
   if (!fields?.length) return null
   const items = fields.map((f) => {
-    const v = obj[f]
-    if (v == null || v === "" || v === "-") return null
-    return { k: f, v: String(v) }
+    const v = pickStr(obj, f)
+    if (!v || v === "-") return null
+    return { k: f, v }
   }).filter(Boolean) as { k: string; v: string }[]
   if (!items.length) return null
   return (
     <div className="mt-2 flex flex-wrap gap-1.5">
       {items.map((m) => (
         <span key={m.k} className="nb-chip text-[10px]">
-          {m.k}: <span className="text-cream ml-1">{m.v}</span>
+          {humanLabel(m.k)}: <span className="text-cream ml-1">{formatValue(m.k, m.v)}</span>
         </span>
       ))}
     </div>
@@ -381,12 +387,85 @@ function DownloadCard({ tool, data }: { tool: ToolDef; data: unknown }) {
   )
 }
 
-function CodeBlock({ data }: { data: unknown }) {
-  const text = JSON.stringify(data, null, 2)
+function ImagePairView({ obj, tool }: { obj: Record<string, unknown>; tool: ToolDef }) {
+  const left = toUrl(pickStr(obj, tool.leftField))
+  const right = toUrl(pickStr(obj, tool.rightField))
+  if (!left && !right) return <CodeBlock data={obj} />
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      {left && (
+        <div className="nb-card overflow-hidden">
+          <img src={left} alt="cowo" className="w-full aspect-square object-cover" loading="lazy" />
+          <div className="p-2 text-center text-sm">Cowo</div>
+        </div>
+      )}
+      {right && (
+        <div className="nb-card overflow-hidden">
+          <img src={right} alt="cewe" className="w-full aspect-square object-cover" loading="lazy" />
+          <div className="p-2 text-center text-sm">Cewe</div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function PrayerTimesView({ obj, tool }: { obj: Record<string, unknown>; tool: ToolDef }) {
+  const title = pickStr(obj, tool.titleField) ?? "Jadwal"
+  const jadwal = pickPath(obj, tool.jadwalField) as Record<string, unknown> | undefined
+  if (!jadwal) {
+    return <KeyValueView obj={obj} titleField={tool.titleField} metaFields={tool.metaFields} />
+  }
+  return (
+    <div className="nb-card p-5">
+      <h3 className="font-head text-xl">{title}</h3>
+      <MetaChips obj={obj} fields={tool.metaFields} />
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {Object.entries(jadwal).map(([k, v]) => {
+          const val = String(v)
+          const isJadwal = !["tanggal", "hijri", "date"].includes(k.toLowerCase())
+          return (
+            <div key={k} className="flex justify-between border-b border-line/60 py-1 text-sm">
+              <span className="text-muted-fg capitalize">{humanLabel(k)}</span>
+              <span className={`font-mono ${isJadwal ? "font-bold text-cream" : ""}`}>{val}</span>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function QuizView({ obj, tool }: { obj: Record<string, unknown>; tool: ToolDef }) {
+  const question = pickStr(obj, tool.questionField) ?? String(pickPath(obj, "question") ?? "")
+  const answer = pickStr(obj, tool.answerField) ?? String(pickPath(obj, "answer") ?? "")
+  const [revealed, setRevealed] = useState(false)
+  return (
+    <div className="nb-card p-5 sm:p-6 flex flex-col gap-4">
+      <div className="text-2xl sm:text-3xl font-head font-bold tracking-tight py-6 px-4 bg-muted text-center border-2 border-line">
+        {question || "Soal tidak tersedia"}
+      </div>
+      <button type="button" className="nb-btn w-full sm:max-w-xs mx-auto" aria-expanded={revealed} onClick={() => setRevealed((v) => !v)}>
+        {revealed ? "Sembunyikan Jawaban" : "Lihat Jawaban"}
+      </button>
+      {revealed && (
+        <div className="nb-card p-4 border-cream text-center bg-bg">
+          <span className="text-sm text-muted-fg block mb-1">Jawaban</span>
+          <span className="font-head text-2xl text-cream font-bold">{answer}</span>
+          <MetaChips obj={obj} fields={tool.metaFields} />
+        </div>
+      )}
+      {!revealed && <MetaChips obj={obj} fields={tool.metaFields} />}
+    </div>
+  )
+}
+
+function CodeBlock({ data, tool }: { data: unknown; tool?: ToolDef }) {
+  const displayed = tool?.resultPath ? (pickPath(data, tool.resultPath) ?? data) : data
+  const text = typeof displayed === "string" ? displayed : JSON.stringify(displayed, null, 2)
   return (
     <div className="nb-card p-5">
       <div className="flex items-center justify-between mb-3">
-        <span className="font-head text-sm">Respons JSON</span>
+        <span className="font-head text-sm">Respons</span>
         <CopyButton text={text} />
       </div>
       <pre className="text-xs overflow-auto max-h-96 font-mono break-words whitespace-pre-wrap">{text}</pre>
