@@ -10,6 +10,17 @@ export interface ToolField {
 
 export type ToolResultKind = "image" | "text" | "json" | "file"
 
+/** cara render hasil yang ramah pengguna; fallback = json */
+export type ToolRenderKind =
+  | "image"
+  | "mediaList"
+  | "resultList"
+  | "articleList"
+  | "profileCard"
+  | "quoteCard"
+  | "keyValue"
+  | "codeBlock"
+
 export interface ToolDef {
   id: string
   category: CategoryId
@@ -21,10 +32,16 @@ export interface ToolDef {
   method?: "GET" | "POST"
   fields: ToolField[]
   resultKind: ToolResultKind
-  /** nama key hasil yang ingin ditampilkan (untuk image/file dari respons JSON) */
-  resultKey?: string
-  /** untuk image: dari mana ambil URL gambar */
-  resultImageKey?: string
+  /** bagaimana hasil harus ditampilkan di UI (default: fallback = codeBlock) */
+  renderKind?: ToolRenderKind
+  /** cara mengambil data dari respons API (nested path) */
+  resultPath?: string
+  /** nama field untuk judul / nama / link utama (fallback) */
+  titleField?: string
+  imageField?: string
+  descriptionField?: string
+  linkField?: string
+  metaFields?: string[]
   /** gunakan client-side (tanpa API) */
   clientSide?: boolean
 }

@@ -3,6 +3,9 @@ import type { ToolDef } from "./types"
 const SIPUTZX = "https://api.siputzx.my.id"
 const KYZZ = "https://api.kyzznekoo.my.id"
 
+/** helper ambil data utama dari respons API */
+const P = (path: string) => ({ resultPath: path })
+
 export const TOOLS: ToolDef[] = [
   // ─────────── TOOLS ───────────
   {
@@ -15,6 +18,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/tools/v2/qr",
     fields: [{ name: "text", label: "Text / URL", type: "text", required: true, placeholder: "https://example.com" }],
     resultKind: "image",
+    renderKind: "image",
   },
   {
     id: "myip",
@@ -26,6 +30,10 @@ export const TOOLS: ToolDef[] = [
     path: "/api/tools/ip",
     fields: [{ name: "ip", label: "IP (opsional)", type: "text", placeholder: "8.8.8.8" }],
     resultKind: "json",
+    renderKind: "keyValue",
+    ...P("result"),
+    titleField: "query",
+    metaFields: ["country", "regionName", "city", "isp", "timezone", "zip"],
   },
   {
     id: "obfuscate",
@@ -37,6 +45,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/tools/obfuscate",
     fields: [{ name: "text", label: "JavaScript code", type: "text", required: true, placeholder: "const x = 1" }],
     resultKind: "json",
+    renderKind: "codeBlock",
   },
   {
     id: "npm",
@@ -48,6 +57,12 @@ export const TOOLS: ToolDef[] = [
     path: "/api/search/npm",
     fields: [{ name: "q", label: "Package name", type: "text", required: true, placeholder: "axios" }],
     resultKind: "json",
+    renderKind: "resultList",
+    ...P("data.result"),
+    titleField: "name",
+    descriptionField: "description",
+    linkField: "link",
+    metaFields: ["version", "date", "publisher"],
   },
   {
     id: "github-search",
@@ -59,6 +74,12 @@ export const TOOLS: ToolDef[] = [
     path: "/api/search/github",
     fields: [{ name: "q", label: "Query", type: "text", required: true, placeholder: "opencode" }],
     resultKind: "json",
+    renderKind: "resultList",
+    ...P("data.item"),
+    titleField: "creator",
+    descriptionField: "description",
+    linkField: "url",
+    metaFields: ["star", "language"],
   },
   {
     id: "upload-imgbb",
@@ -70,6 +91,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/upload/imgbb",
     fields: [{ name: "url", label: "Image URL", type: "url", required: true, placeholder: "https://..." }],
     resultKind: "json",
+    renderKind: "keyValue",
   },
   {
     id: "upload-github",
@@ -84,6 +106,7 @@ export const TOOLS: ToolDef[] = [
       { name: "accessToken", label: "GitHub token (opsional)", type: "text" },
     ],
     resultKind: "json",
+    renderKind: "keyValue",
   },
   {
     id: "kodepos",
@@ -95,6 +118,11 @@ export const TOOLS: ToolDef[] = [
     path: "/api/tools/kodepos",
     fields: [{ name: "form", label: "Kota / kecamatan", type: "text", required: true, placeholder: "jakarta" }],
     resultKind: "json",
+    renderKind: "resultList",
+    ...P("data"),
+    titleField: "kodepos",
+    descriptionField: "kecamatan",
+    metaFields: ["desa", "kota", "provinsi"],
   },
   {
     id: "tempmail",
@@ -106,6 +134,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/tools/tmpmail/v2/create",
     fields: [],
     resultKind: "json",
+    renderKind: "keyValue",
   },
 
   // ─────────── CANVAS ───────────
@@ -117,9 +146,9 @@ export const TOOLS: ToolDef[] = [
     source: "siputzx",
     baseUrl: SIPUTZX,
     path: "/api/m/brat",
-    method: "GET",
     fields: [{ name: "text", label: "Text", type: "text", required: true, placeholder: "hello world" }],
     resultKind: "image",
+    renderKind: "image",
   },
   {
     id: "balogo",
@@ -135,6 +164,7 @@ export const TOOLS: ToolDef[] = [
       { name: "color", label: "Text color (opsional)", type: "text", defaultValue: "#F5DEB3" },
     ],
     resultKind: "image",
+    renderKind: "image",
   },
   {
     id: "iqc",
@@ -149,6 +179,7 @@ export const TOOLS: ToolDef[] = [
       { name: "avatar", label: "Avatar URL (opsional)", type: "url" },
     ],
     resultKind: "image",
+    renderKind: "image",
   },
   {
     id: "ppcouple",
@@ -160,6 +191,9 @@ export const TOOLS: ToolDef[] = [
     path: "/api/image/ppcouple",
     fields: [],
     resultKind: "json",
+    renderKind: "mediaList",
+    ...P("data"),
+    imageField: "image",
   },
   {
     id: "story-ig",
@@ -175,6 +209,7 @@ export const TOOLS: ToolDef[] = [
       { name: "avatar", label: "Avatar URL", type: "url" },
     ],
     resultKind: "image",
+    renderKind: "image",
   },
   {
     id: "fake-ig",
@@ -189,6 +224,7 @@ export const TOOLS: ToolDef[] = [
       { name: "avatar", label: "Avatar URL", type: "url" },
     ],
     resultKind: "image",
+    renderKind: "image",
   },
   {
     id: "wanted",
@@ -203,6 +239,7 @@ export const TOOLS: ToolDef[] = [
       { name: "text", label: "Name", type: "text", placeholder: "Wanted" },
     ],
     resultKind: "image",
+    renderKind: "image",
   },
   {
     id: "wasted",
@@ -217,6 +254,7 @@ export const TOOLS: ToolDef[] = [
       { name: "text", label: "Text", type: "text", placeholder: "WASTED" },
     ],
     resultKind: "image",
+    renderKind: "image",
   },
   {
     id: "upscale-uhd",
@@ -228,6 +266,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/upscale/v5/uhd",
     fields: [{ name: "url", label: "Image URL", type: "url", required: true }],
     resultKind: "image",
+    renderKind: "image",
   },
   {
     id: "hdfoto",
@@ -239,6 +278,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/upscale/hdfoto",
     fields: [{ name: "url", label: "Image URL", type: "url", required: true }],
     resultKind: "image",
+    renderKind: "image",
   },
   {
     id: "sertifikat",
@@ -250,6 +290,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/image/sertifikat",
     fields: [{ name: "text", label: "Nama", type: "text", required: true }],
     resultKind: "image",
+    renderKind: "image",
   },
   {
     id: "faceblur",
@@ -261,6 +302,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/editor/faceblur",
     fields: [{ name: "url", label: "Image URL", type: "url", required: true }],
     resultKind: "image",
+    renderKind: "image",
   },
   {
     id: "removebg",
@@ -272,6 +314,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/tools/rbg",
     fields: [{ name: "url", label: "Image URL", type: "url", required: true }],
     resultKind: "image",
+    renderKind: "image",
   },
 
   // ─────────── DOWNLOADER ───────────
@@ -285,6 +328,12 @@ export const TOOLS: ToolDef[] = [
     path: "/api/d/tiktok/v2",
     fields: [{ name: "url", label: "URL", type: "url", required: true, placeholder: "https://tiktok.com/..." }],
     resultKind: "json",
+    renderKind: "resultList",
+    ...P("data"),
+    titleField: "title",
+    descriptionField: "author",
+    linkField: "no_watermark_link",
+    metaFields: ["duration"],
   },
   {
     id: "instagram",
@@ -296,6 +345,10 @@ export const TOOLS: ToolDef[] = [
     path: "/api/d/sssinstagram",
     fields: [{ name: "url", label: "URL", type: "url", required: true, placeholder: "https://instagram.com/..." }],
     resultKind: "json",
+    renderKind: "resultList",
+    ...P("data"),
+    titleField: "title",
+    linkField: "url",
   },
   {
     id: "facebook",
@@ -307,6 +360,10 @@ export const TOOLS: ToolDef[] = [
     path: "/api/d/facebook",
     fields: [{ name: "url", label: "URL", type: "url", required: true, placeholder: "https://facebook.com/..." }],
     resultKind: "json",
+    renderKind: "resultList",
+    ...P("data"),
+    titleField: "title",
+    linkField: "url",
   },
   {
     id: "capcut",
@@ -318,6 +375,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/d/capcut",
     fields: [{ name: "url", label: "URL", type: "url", required: true }],
     resultKind: "json",
+    renderKind: "resultList",
   },
   {
     id: "gdrive",
@@ -329,6 +387,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/d/gdrive",
     fields: [{ name: "url", label: "URL", type: "url", required: true, placeholder: "https://drive.google.com/..." }],
     resultKind: "json",
+    renderKind: "resultList",
   },
   {
     id: "savefrom",
@@ -340,6 +399,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/d/savefrom",
     fields: [{ name: "url", label: "URL", type: "url", required: true, placeholder: "https://youtube.com/..." }],
     resultKind: "json",
+    renderKind: "resultList",
   },
   {
     id: "snackvideo",
@@ -351,6 +411,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/downloader/snackvideo",
     fields: [{ name: "url", label: "URL", type: "url", required: true }],
     resultKind: "json",
+    renderKind: "resultList",
   },
   {
     id: "spotify-dl",
@@ -362,6 +423,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/downloader/spotify",
     fields: [{ name: "url", label: "URL", type: "url", required: true, placeholder: "https://open.spotify.com/..." }],
     resultKind: "json",
+    renderKind: "resultList",
   },
   {
     id: "ytmp3",
@@ -373,6 +435,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/downloader/ytmp3",
     fields: [{ name: "url", label: "URL", type: "url", required: true, placeholder: "https://youtube.com/watch?v=..." }],
     resultKind: "json",
+    renderKind: "resultList",
   },
   {
     id: "all-dl",
@@ -384,6 +447,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/downloader/all",
     fields: [{ name: "url", label: "URL", type: "url", required: true }],
     resultKind: "json",
+    renderKind: "resultList",
   },
 
   // ─────────── NEWS & INFO ───────────
@@ -397,6 +461,13 @@ export const TOOLS: ToolDef[] = [
     path: "/api/berita/cnn",
     fields: [],
     resultKind: "json",
+    renderKind: "articleList",
+    ...P("data"),
+    titleField: "title",
+    descriptionField: "image_thumbnail",
+    imageField: "image_thumbnail",
+    linkField: "link",
+    metaFields: ["slug", "image_full"],
   },
   {
     id: "berita-kompas",
@@ -408,6 +479,8 @@ export const TOOLS: ToolDef[] = [
     path: "/api/berita/kompas",
     fields: [],
     resultKind: "json",
+    renderKind: "articleList",
+    ...P("data"),
   },
   {
     id: "berita-liputan6",
@@ -419,6 +492,8 @@ export const TOOLS: ToolDef[] = [
     path: "/api/berita/liputan6",
     fields: [],
     resultKind: "json",
+    renderKind: "articleList",
+    ...P("data"),
   },
   {
     id: "berita-antara",
@@ -430,6 +505,8 @@ export const TOOLS: ToolDef[] = [
     path: "/api/berita/antara",
     fields: [],
     resultKind: "json",
+    renderKind: "articleList",
+    ...P("data"),
   },
   {
     id: "berita-suara",
@@ -441,6 +518,8 @@ export const TOOLS: ToolDef[] = [
     path: "/api/berita/suara",
     fields: [],
     resultKind: "json",
+    renderKind: "articleList",
+    ...P("data"),
   },
   {
     id: "berita-sindonews",
@@ -452,6 +531,8 @@ export const TOOLS: ToolDef[] = [
     path: "/api/berita/sindonews",
     fields: [],
     resultKind: "json",
+    renderKind: "articleList",
+    ...P("data"),
   },
   {
     id: "berita-merdeka",
@@ -463,6 +544,8 @@ export const TOOLS: ToolDef[] = [
     path: "/api/berita/merdeka",
     fields: [],
     resultKind: "json",
+    renderKind: "articleList",
+    ...P("data"),
   },
   {
     id: "berita-tribun",
@@ -474,6 +557,8 @@ export const TOOLS: ToolDef[] = [
     path: "/api/berita/tribunnews",
     fields: [],
     resultKind: "json",
+    renderKind: "articleList",
+    ...P("data"),
   },
   {
     id: "berita-cnbc",
@@ -485,6 +570,8 @@ export const TOOLS: ToolDef[] = [
     path: "/api/berita/cnbcindonesia",
     fields: [],
     resultKind: "json",
+    renderKind: "articleList",
+    ...P("data"),
   },
   {
     id: "bmkg",
@@ -496,6 +583,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/info/bmkg",
     fields: [],
     resultKind: "json",
+    renderKind: "resultList",
   },
   {
     id: "jadwaltv",
@@ -507,6 +595,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/info/jadwaltv",
     fields: [],
     resultKind: "json",
+    renderKind: "resultList",
   },
   {
     id: "sholat",
@@ -518,6 +607,10 @@ export const TOOLS: ToolDef[] = [
     path: "/api/search/sholat",
     fields: [{ name: "kota", label: "Kota", type: "text", required: true, placeholder: "jakarta" }],
     resultKind: "json",
+    renderKind: "keyValue",
+    ...P("data.result"),
+    titleField: "lokasi",
+    metaFields: ["daerah", "negara", "timezone", "method", "tanggal", "hijri", "imsak", "subuh", "terbit", "dzuhur", "ashar", "maghrib", "isya"],
   },
 
   // ─────────── GAMES & FUN ───────────
@@ -531,6 +624,10 @@ export const TOOLS: ToolDef[] = [
     path: "/api/games/tebakgambar",
     fields: [],
     resultKind: "json",
+    renderKind: "resultList",
+    imageField: "img",
+    titleField: "soal",
+    descriptionField: "jawaban",
   },
   {
     id: "family100",
@@ -542,6 +639,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/games/family100",
     fields: [],
     resultKind: "json",
+    renderKind: "resultList",
   },
   {
     id: "maths",
@@ -553,6 +651,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/games/maths",
     fields: [],
     resultKind: "json",
+    renderKind: "resultList",
   },
   {
     id: "susun-kata",
@@ -564,6 +663,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/games/susunkata",
     fields: [],
     resultKind: "json",
+    renderKind: "resultList",
   },
   {
     id: "cak-lontong",
@@ -575,6 +675,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/games/caklontong",
     fields: [],
     resultKind: "json",
+    renderKind: "resultList",
   },
   {
     id: "asah-otak",
@@ -586,6 +687,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/games/asahotak",
     fields: [],
     resultKind: "json",
+    renderKind: "resultList",
   },
   {
     id: "quote-anime",
@@ -597,6 +699,9 @@ export const TOOLS: ToolDef[] = [
     path: "/api/r/quotesanime",
     fields: [],
     resultKind: "json",
+    renderKind: "quoteCard",
+    titleField: "quote",
+    ...P("data"),
   },
   {
     id: "blue-archive",
@@ -608,6 +713,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/r/blue-archive",
     fields: [],
     resultKind: "json",
+    renderKind: "mediaList",
   },
 
   // ─────────── PRIMBON ───────────
@@ -621,6 +727,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/primbon/artinama",
     fields: [{ name: "nama", label: "Nama", type: "text", required: true, placeholder: "Budi" }],
     resultKind: "json",
+    renderKind: "resultList",
   },
   {
     id: "kecocokan",
@@ -635,6 +742,7 @@ export const TOOLS: ToolDef[] = [
       { name: "nama2", label: "Nama pasangan", type: "text", required: true },
     ],
     resultKind: "json",
+    renderKind: "resultList",
   },
   {
     id: "zodiak",
@@ -654,6 +762,7 @@ export const TOOLS: ToolDef[] = [
       },
     ],
     resultKind: "json",
+    renderKind: "resultList",
   },
 
   // ─────────── SEARCH ───────────
@@ -667,6 +776,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/s/youtube",
     fields: [{ name: "query", label: "Query", type: "text", required: true, placeholder: "naruto opening" }],
     resultKind: "json",
+    renderKind: "resultList",
   },
   {
     id: "pinterest-search",
@@ -678,6 +788,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/s/pinterest",
     fields: [{ name: "query", label: "Query", type: "text", required: true, placeholder: "anime" }],
     resultKind: "json",
+    renderKind: "mediaList",
   },
   {
     id: "resep",
@@ -689,6 +800,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/s/resep",
     fields: [{ name: "query", label: "Query", type: "text", required: true, placeholder: "rendang" }],
     resultKind: "json",
+    renderKind: "resultList",
   },
   {
     id: "apple-music",
@@ -700,6 +812,7 @@ export const TOOLS: ToolDef[] = [
     path: "/api/search/applemusic",
     fields: [{ name: "q", label: "Query", type: "text", required: true, placeholder: "coldplay" }],
     resultKind: "json",
+    renderKind: "resultList",
   },
   {
     id: "spotify-search",
@@ -711,6 +824,12 @@ export const TOOLS: ToolDef[] = [
     path: "/api/search/v2/spotify",
     fields: [{ name: "q", label: "Query", type: "text", required: true, placeholder: "coldplay" }],
     resultKind: "json",
+    renderKind: "resultList",
+    ...P("songs"),
+    titleField: "title",
+    descriptionField: "artist",
+    imageField: "thumbnail",
+    linkField: "url",
   },
   {
     id: "grup-wa",
@@ -722,6 +841,12 @@ export const TOOLS: ToolDef[] = [
     path: "/api/search/group",
     fields: [{ name: "q", label: "Query", type: "text", required: true, placeholder: "indonesia" }],
     resultKind: "json",
+    renderKind: "resultList",
+    ...P("data"),
+    titleField: "name",
+    descriptionField: "description",
+    imageField: "thumbnail",
+    linkField: "join_url",
   },
 
   // ─────────── STALKER ───────────
@@ -735,6 +860,13 @@ export const TOOLS: ToolDef[] = [
     path: "/api/stalk/github",
     fields: [{ name: "user", label: "Username", type: "text", required: true, placeholder: "torvalds" }],
     resultKind: "json",
+    renderKind: "profileCard",
+    titleField: "nickname",
+    descriptionField: "bio",
+    imageField: "profile_pic",
+    linkField: "html_url",
+    ...P("data"),
+    metaFields: ["username", "id", "followers", "following", "public_repos", "type"],
   },
   {
     id: "stalk-twitter",
@@ -746,6 +878,8 @@ export const TOOLS: ToolDef[] = [
     path: "/api/stalk/twitter",
     fields: [{ name: "user", label: "Username", type: "text", required: true, placeholder: "elonmusk" }],
     resultKind: "json",
+    renderKind: "profileCard",
+    ...P("data"),
   },
   {
     id: "stalk-threads",
@@ -757,5 +891,6 @@ export const TOOLS: ToolDef[] = [
     path: "/api/stalker/threads",
     fields: [{ name: "q", label: "Username", type: "text", required: true, placeholder: "meta" }],
     resultKind: "json",
+    renderKind: "profileCard",
   },
 ]

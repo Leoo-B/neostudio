@@ -4,12 +4,8 @@ import { useQuery } from "@tanstack/react-query"
 import { TOOLS, type ToolDef, type ApiResponse } from "@neostudio/shared"
 import { Header, Footer } from "./HomePage"
 import { useToast } from "../components/Toast"
-import { SuccessCheck } from "../components/SuccessCheck"
-import {
-  ArrowDownTrayIcon,
-  ClipboardDocumentIcon,
-  ExclamationTriangleIcon,
-} from "@heroicons/react/24/outline"
+import { ResultView } from "../components/ResultView"
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline"
 
 async function runTool(toolId: string, params: Record<string, unknown>): Promise<ApiResponse> {
   const res = await fetch(`/api/run/${toolId}`, {
@@ -138,101 +134,4 @@ function Field({ field, value, onChange }: { field: ToolDef["fields"][number]; v
       />
     </label>
   )
-}
-
-function ResultView({ tool, res }: { tool: ToolDef; res: ApiResponse }) {
-  const [showCheck, setShowCheck] = useState(false)
-  useEffect(() => {
-    setShowCheck(false)
-    const t = requestAnimationFrame(() => setShowCheck(true))
-    return () => cancelAnimationFrame(t)
-  }, [res])
-
-  return (
-    <section aria-label="Hasil" className="mt-6">
-      <div className="flex items-center gap-2 mb-3">
-        <SuccessCheck show={showCheck} />
-        <h2 className="font-head text-xl">Hasil</h2>
-      </div>
-      {res.kind === "image" && res.imageUrl ? (
-        <div className="nb-card p-4">
-          <a href={res.imageUrl} download={`${tool.id}.png`} className="nb-btn inline-flex items-center gap-2 mb-4">
-            <ArrowDownTrayIcon className="w-4 h-4" /> Unduh Gambar
-          </a>
-          <img src={res.imageUrl} alt={tool.name} className="w-full h-auto border-2 border-line bg-black" />
-        </div>
-      ) : res.kind === "json" ? (
-        <JsonBlock tool={tool} data={res.data} />
-      ) : (
-        <div className="nb-card p-5">
-          <p className="whitespace-pre-wrap break-words font-mono text-sm">{String(res.data ?? "")}</p>
-        </div>
-      )}
-    </section>
-  )
-}
-
-function CopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false)
-  const toast = useToast()
-  return (
-    <button
-      onClick={() => {
-        void navigator.clipboard.writeText(text)
-        setCopied(true)
-        toast("Disalin ke clipboard")
-        setTimeout(() => setCopied(false), 1200)
-      }}
-      className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 border-2 border-line hover:bg-muted transition-colors duration-150 cursor-pointer"
-    >
-      <ClipboardDocumentIcon className="w-4 h-4" />
-      {copied ? "Tersalin!" : "Salin"}
-    </button>
-  )
-}
-
-function JsonBlock({ data }: { tool: ToolDef; data: unknown }) {
-  const text = JSON.stringify(data, null, 2)
-  // flattens: mengambil daftar URL gambar bila ada
-  const images = extractImages(data)
-  return (
-    <div className="space-y-4">
-      {images.length > 0 && (
-        <div className="nb-card p-4">
-          <div className="flex items-center justify-between mb-3">
-            <span className="font-head text-sm">Media ditemukan ({images.length})</span>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {images.slice(0, 9).map((src, i) => (
-              <img key={i} src={src} alt={`media ${i + 1}`} className="w-full h-32 object-cover border-2 border-line bg-black" />
-            ))}
-          </div>
-        </div>
-      )}
-      <div className="nb-card p-5">
-        <div className="flex items-center justify-between mb-3">
-          <span className="font-head text-sm">Respons JSON</span>
-          <CopyButton text={text} />
-        </div>
-        <pre className="text-xs overflow-auto max-h-96 font-mono break-words whitespace-pre-wrap">{text}</pre>
-      </div>
-    </div>
-  )
-}
-
-function extractImages(data: unknown): string[] {
-  const out: string[] = []
-  const walk = (v: unknown) => {
-    if (typeof v === "string") {
-      if (/^https?:\/\/.+\.(jp?g|png|webp|gif)(\?|$)/i.test(v) || /^https?:\/\/.+(media|cdn|img|image|thumb)/i.test(v)) {
-        out.push(v)
-      }
-    } else if (Array.isArray(v)) {
-      v.forEach(walk)
-    } else if (v && typeof v === "object") {
-      Object.values(v).forEach(walk)
-    }
-  }
-  walk(data)
-  return [...new Set(out)].slice(0, 12)
 }

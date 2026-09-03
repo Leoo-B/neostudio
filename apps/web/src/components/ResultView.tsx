@@ -1,0 +1,317 @@
+import { useState } from "react"
+import { ArrowTopRightOnSquareIcon, ArrowDownTrayIcon, ClipboardDocumentIcon, UserCircleIcon } from "@heroicons/react/24/outline"
+import { useToast } from "./Toast"
+import { pickArr, pickPath, pickStr, toUrl } from "../lib/results"
+import type { ApiResponse, ToolDef } from "@neostudio/shared"
+
+export function ResultView({ tool, res }: { tool: ToolDef; res: ApiResponse }) {
+  return (
+    <section aria-label="Hasil" className="mt-6">
+      <div className="flex items-center gap-2 mb-3">
+        <SuccessBadge />
+        <h2 className="font-head text-xl">Hasil</h2>
+      </div>
+      {res.kind === "image" && res.imageUrl ? (
+        <ImageView tool={tool} imageUrl={res.imageUrl} />
+      ) : res.kind === "json" ? (
+        <JsonView tool={tool} data={res.data} />
+      ) : (
+        <TextView text={String(res.data ?? "")} />
+      )}
+    </section>
+  )
+}
+
+function ImageView({ tool, imageUrl }: { tool: ToolDef; imageUrl: string }) {
+  return (
+    <div className="nb-card p-4">
+      <a href={imageUrl} download={`${tool.id}.png`} className="nb-btn inline-flex items-center gap-2 mb-4">
+        <ArrowDownTrayIcon className="w-4 h-4" /> Unduh Gambar
+      </a>
+      <img src={imageUrl} alt={tool.name} className="w-full h-auto border-2 border-line bg-black" />
+    </div>
+  )
+}
+
+function TextView({ text }: { text: string }) {
+  return (
+    <div className="nb-card p-5">
+      <p className="whitespace-pre-wrap break-words font-mono text-sm">{text}</p>
+    </div>
+  )
+}
+
+function JsonView({ tool, data }: { tool: ToolDef; data: unknown }) {
+  const kind = tool.renderKind ?? "codeBlock"
+  const items = pickArr<Record<string, unknown>>(pickPath(data, tool.resultPath))
+  switch (kind) {
+    case "image":
+      return <ImageView tool={tool} imageUrl={String(pickPath(data, "data.imageUrl") || "")} />
+    case "keyValue":
+      return <KeyValueView obj={(items[0] ?? pickPath(data, tool.resultPath) ?? data) as Record<string, unknown>} titleField={tool.titleField} metaFields={tool.metaFields} />
+    case "articleList":
+      return <ArticleList items={items} tool={tool} />
+    case "mediaList":
+      return <MediaList items={items} tool={tool} rawData={data} />
+    case "resultList":
+      return <ResultList items={items} tool={tool} rawData={data} />
+    case "profileCard":
+      return <ProfileCardView obj={(items[0] ?? pickPath(data, tool.resultPath) ?? data) as Record<string, unknown>} tool={tool} />
+    case "quoteCard":
+      return <QuoteCardView data={data} tool={tool} />
+    case "codeBlock":
+    default:
+      return <CodeBlock data={data} />
+  }
+}
+
+function SuccessBadge() {
+  const [show, setShow] = useState(false)
+  if (typeof window !== "undefined" && !show) {
+    queueMicrotask(() => setShow(true))
+  }
+  return (
+    <span className="t-success-check" data-state={show ? "in" : "out"} aria-hidden="true">
+      <svg viewBox="0 0 48 48" fill="none" className="w-6 h-6">
+        <circle cx="24" cy="24" r="20" stroke="#F5DEB3" strokeWidth="3" />
+        <path d="M14 25 L21 32 L34 18" stroke="#F5DEB3" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </span>
+  )
+}
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+  const toast = useToast()
+  return (
+    <button
+      onClick={() => {
+        void navigator.clipboard.writeText(text)
+        setCopied(true)
+        toast("Disalin ke clipboard")
+        setTimeout(() => setCopied(false), 1200)
+      }}
+      className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 border-2 border-line hover:bg-muted transition-colors duration-150 cursor-pointer"
+    >
+      <ClipboardDocumentIcon className="w-4 h-4" />
+      {copied ? "Tersalin!" : "Salin"}
+    </button>
+  )
+}
+
+function MetaChips({ obj, fields }: { obj: Record<string, unknown>; fields?: string[] }) {
+  if (!fields?.length) return null
+  const items = fields.map((f) => {
+    const v = obj[f]
+    if (v == null || v === "" || v === "-") return null
+    return { k: f, v: String(v) }
+  }).filter(Boolean) as { k: string; v: string }[]
+  if (!items.length) return null
+  return (
+    <div className="mt-2 flex flex-wrap gap-1.5">
+      {items.map((m) => (
+        <span key={m.k} className="nb-chip text-[10px]">
+          {m.k}: <span className="text-cream ml-1">{m.v}</span>
+        </span>
+      ))}
+    </div>
+  )
+}
+
+function KeyValueView({ obj, titleField, metaFields }: { obj: Record<string, unknown>; titleField?: string; metaFields?: string[] }) {
+  const title = titleField ? pickStr(obj, titleField) : undefined
+  const pairs: [string, string][] = []
+  for (const [k, v] of Object.entries(obj)) {
+    if (k === "creator" || k === "status" || k === "success" || k === "timestamp") continue
+    if (titleField && k === titleField) continue
+    if (typeof v === "object" && v !== null) continue
+    pairs.push([k, String(v ?? "")])
+  }
+  return (
+    <div className="nb-card p-5">
+      {title && <h3 className="font-head text-lg text-cream mb-3">{title}</h3>}
+      <dl className="grid grid-cols-1 sm:grid-cols-[10rem_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm">
+        {pairs.map(([k, v]) => (
+          <div key={k} className="contents">
+            <dt className="text-muted-fg capitalize">{k.replace(/_/g, " ")}</dt>
+            <dd className="min-w-0 font-medium break-words">{v}</dd>
+          </div>
+        ))}
+      </dl>
+      {metaFields && <MetaChips obj={obj} fields={metaFields} />}
+    </div>
+  )
+}
+
+function ProfileCardView({ obj, tool }: { obj: Record<string, unknown>; tool: ToolDef }) {
+  const name = pickStr(obj, tool.titleField ?? "name") ?? pickStr(obj, "username") ?? pickStr(obj, "nickname") ?? "User"
+  const bio = pickStr(obj, tool.descriptionField ?? "bio")
+  const avatar = toUrl(pickStr(obj, tool.imageField ?? "profile_pic") ?? pickStr(obj, "avatar_url"))
+  const link = toUrl(pickStr(obj, tool.linkField ?? "url") ?? pickStr(obj, "html_url"))
+  return (
+    <div className="nb-card p-5 sm:p-6 flex gap-5">
+      {avatar ? (
+        <img src={avatar} alt={name} className="w-20 h-20 sm:w-24 sm:h-24 border-2 border-line bg-altar object-cover" />
+      ) : (
+        <div className="w-20 h-20 sm:w-24 sm:h-24 border-2 border-line bg-altar grid place-items-center">
+          <UserCircleIcon className="w-10 h-10 text-muted-fg" />
+        </div>
+      )}
+      <div className="flex-1 min-w-0">
+        <h3 className="font-head text-xl text-cream">{name}</h3>
+        {bio && <p className="text-sm text-muted-fg mt-1">{bio}</p>}
+        <MetaChips obj={obj} fields={tool.metaFields} />
+        {link && (
+          <a href={link} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm text-cream hover:underline cursor-pointer">
+            Buka profil <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+          </a>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function QuoteCardView({ data, tool }: { data: unknown; tool: ToolDef }) {
+  const items = pickArr<Record<string, unknown>>(pickPath(data, tool.resultPath ?? ""))
+  const first = items[0] ?? (data as Record<string, unknown>)
+  const q = pickStr(first, tool.titleField ?? "quote") ?? pickStr(first, "result") ?? JSON.stringify(first).slice(0, 200)
+  const author = pickStr(first, "author") ?? pickStr(first, "by") ?? pickStr(first, "character")
+  return (
+    <div className="nb-card p-6">
+      <p className="font-head text-xl sm:text-2xl leading-relaxed text-cream">“{q}”</p>
+      {author && <p className="mt-3 text-sm text-muted-fg">— {author}</p>}
+    </div>
+  )
+}
+
+function ArticleList({ items, tool }: { items: Record<string, unknown>[]; tool: ToolDef }) {
+  if (!items.length) {
+    return <CodeBlock data={items} />
+  }
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {items.slice(0, 12).map((it, i) => {
+        const title = pickStr(it, tool.titleField ?? "title") ?? "Tanpa judul"
+        const img = toUrl(pickStr(it, tool.imageField ?? "image_thumbnail") ?? pickStr(it, "image_full") ?? pickStr(it, "img"))
+        const link = toUrl(pickStr(it, tool.linkField ?? "link") ?? pickStr(it, "url"))
+        return (
+          <a
+            key={i}
+            href={link ?? "#"}
+            target="_blank"
+            rel="noreferrer"
+            className="nb-card block p-0 overflow-hidden group"
+          >
+            {img ? (
+              <div className="aspect-video bg-black border-b-2 border-line overflow-hidden">
+                <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
+              </div>
+            ) : (
+              <div className="aspect-video bg-altar border-b-2 border-line grid place-items-center text-muted-fg text-xs font-mono">
+                no image
+              </div>
+            )}
+            <div className="p-4">
+              <h3 className="font-head text-base leading-snug line-clamp-3 group-hover:text-cream transition-colors duration-150">
+                {title}
+              </h3>
+              <MetaChips obj={it} fields={tool.metaFields} />
+            </div>
+          </a>
+        )
+      })}
+    </div>
+  )
+}
+
+function MediaList({ items, tool, rawData }: { items: Record<string, unknown>[]; tool: ToolDef; rawData: unknown }) {
+  if (!items.length) {
+    const fallback = extractImages(rawData)
+    if (fallback.length) {
+      return (
+        <div className="nb-card p-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {fallback.slice(0, 12).map((src, i) => (
+              <a key={i} href={src} target="_blank" rel="noreferrer" className="block border-2 border-line bg-black">
+                <img src={src} alt="" className="w-full h-32 object-cover" loading="lazy" />
+              </a>
+            ))}
+          </div>
+        </div>
+      )
+    }
+    return <CodeBlock data={rawData} />
+  }
+  return (
+    <div className="nb-card p-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {items.slice(0, 12).map((it, i) => {
+          const src = toUrl(pickStr(it, tool.imageField ?? "image") ?? pickStr(it, "url") ?? pickStr(it, "thumbnail"))
+          if (!src) return null
+          return (
+            <a key={i} href={src} target="_blank" rel="noreferrer" className="block border-2 border-line bg-black">
+              <img src={src} alt="" className="w-full h-32 object-cover" loading="lazy" />
+            </a>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function ResultList({ items, tool, rawData }: { items: Record<string, unknown>[]; tool: ToolDef; rawData: unknown }) {
+  if (!items.length) {
+    return <CodeBlock data={rawData} />
+  }
+  return (
+    <div className="space-y-3">
+      {items.slice(0, 12).map((it, i) => {
+        const title = pickStr(it, tool.titleField ?? "title") ?? pickStr(it, "name") ?? pickStr(it, "username") ?? `Item ${i + 1}`
+        const desc = pickStr(it, tool.descriptionField ?? "description")
+        const link = toUrl(pickStr(it, tool.linkField ?? "url") ?? pickStr(it, "link") ?? pickStr(it, "join_url"))
+        return (
+          <div key={i} className="nb-card p-4 flex gap-4 items-start">
+            <div className="flex-1 min-w-0">
+              <h3 className="font-head text-base break-words">{title}</h3>
+              {desc && <p className="text-sm text-muted-fg mt-1 break-words line-clamp-2">{desc}</p>}
+              <MetaChips obj={it} fields={tool.metaFields} />
+            </div>
+            {link && (
+              <a href={link} target="_blank" rel="noreferrer" className="nb-btn text-xs px-3 py-1.5 shrink-0 inline-flex items-center gap-1.5">
+                Buka <ArrowTopRightOnSquareIcon className="w-3.5 h-3.5" />
+              </a>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+function CodeBlock({ data }: { data: unknown }) {
+  const text = JSON.stringify(data, null, 2)
+  return (
+    <div className="nb-card p-5">
+      <div className="flex items-center justify-between mb-3">
+        <span className="font-head text-sm">Respons JSON</span>
+        <CopyButton text={text} />
+      </div>
+      <pre className="text-xs overflow-auto max-h-96 font-mono break-words whitespace-pre-wrap">{text}</pre>
+    </div>
+  )
+}
+
+function extractImages(data: unknown): string[] {
+  const out: string[] = []
+  const walk = (v: unknown) => {
+    if (typeof v === "string") {
+      if (/^https?:\/\/.+\.(jp?g|png|webp|gif)(\?|$)/i.test(v) || /^data:image\//.test(v)) out.push(v)
+    } else if (Array.isArray(v)) {
+      v.forEach(walk)
+    } else if (v && typeof v === "object") {
+      Object.values(v).forEach(walk)
+    }
+  }
+  walk(data)
+  return [...new Set(out)].slice(0, 12)
+}
