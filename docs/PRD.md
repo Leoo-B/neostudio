@@ -106,7 +106,7 @@ Database belum dipakai di MVP (tidak ada state pengguna). Ditambah nanti bila pe
 
 ## 9. Desain
 
-Mengikuti `design-system/neostudio/MASTER.md`:
+Mengikuti `docs/design-system.md`:
 
 - **Style:** Dark Mode (OLED), dark-only di MVP
 - **Pattern:** hero dengan kotak pencarian > grid kategori > daftar tool
@@ -123,7 +123,7 @@ Mengikuti `design-system/neostudio/MASTER.md`:
 - [ ] Galat upstream ditampilkan sebagai pesan ramah, bukan crash
 - [ ] `pnpm typecheck` dan `pnpm lint` bersih
 - [ ] Ada uji otomatis untuk katalog tool dan normalisasi respons proxy
-- [ ] Lolos checklist aksesibilitas di `MASTER.md`
+- [ ] Lolos checklist aksesibilitas di `docs/design-system.md`
 
 ## 11. Risiko
 

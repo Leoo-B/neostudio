@@ -1,8 +1,6 @@
 # Design System — neostudio
 
-> **LOGIC:** When building a page, first check `design-system/pages/[page].md`.
-> If that file exists, its rules **override** this Master file.
-> If not, strictly follow the rules below.
+> **LOGIC:** Dokumen ini adalah satu-satunya sumber kebenaran desain. Nilai CSS asli berada di `apps/web/tailwind.config.ts` dan `apps/web/src/styles/` — pastikan tetap sinkron jika mengubah di sini.
 
 ---
 
