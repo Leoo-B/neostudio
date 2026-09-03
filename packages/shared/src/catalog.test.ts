@@ -37,3 +37,17 @@ test("semua field punya name + label + type valid", () => {
 test("total tools sama dengan jumlah dikunci (64)", () => {
   assert.equal(TOOLS.length, 64)
 })
+
+test("semua downloader pakai downloadCard + punya downloadField", () => {
+  const dls = TOOLS.filter((t) => t.category === "downloader")
+  assert.ok(dls.length >= 10, "harus ada minimal 10 downloader")
+  for (const t of dls) {
+    assert.equal(t.renderKind, "downloadCard", `download ${t.id} harus downloadCard`)
+    assert.ok(t.downloadField || (t.downloadFields && t.downloadFields.length), `download ${t.id} wajib downloadField/downloadFields`)
+  }
+  // siputzx downloader wajib punya fallback
+  const siputzxDl = dls.filter((t) => t.source === "siputzx")
+  for (const t of siputzxDl) {
+    assert.ok(t.fallbackToolId, `download siputzx ${t.id} wajib fallbackToolId`)
+  }
+})

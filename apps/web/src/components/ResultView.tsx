@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { ArrowTopRightOnSquareIcon, ArrowDownTrayIcon, ClipboardDocumentIcon, UserCircleIcon } from "@heroicons/react/24/outline"
+import { ArrowTopRightOnSquareIcon, ArrowDownTrayIcon, ClipboardDocumentIcon, UserCircleIcon, ClipboardIcon } from "@heroicons/react/24/outline"
 import { useToast } from "./Toast"
 import { pickArr, pickPath, pickStr, toUrl } from "../lib/results"
 import type { ApiResponse, ToolDef } from "@neostudio/shared"
@@ -59,6 +59,8 @@ function JsonView({ tool, data }: { tool: ToolDef; data: unknown }) {
       return <ProfileCardView obj={(items[0] ?? pickPath(data, tool.resultPath) ?? data) as Record<string, unknown>} tool={tool} />
     case "quoteCard":
       return <QuoteCardView data={data} tool={tool} />
+    case "downloadCard":
+      return <DownloadCard tool={tool} data={data} />
     case "codeBlock":
     default:
       return <CodeBlock data={data} />
@@ -284,6 +286,97 @@ function ResultList({ items, tool, rawData }: { items: Record<string, unknown>[]
           </div>
         )
       })}
+    </div>
+  )
+}
+
+function DownloadCard({ tool, data }: { tool: ToolDef; data: unknown }) {
+  const toast = useToast()
+  const raw = (pickPath(data, tool.resultPath) ?? data) as Record<string, unknown>
+  const urlFields = (tool.downloadFields && tool.downloadFields.length ? tool.downloadFields : tool.downloadField ? [tool.downloadField] : ["url"])
+  const read = (path: string | undefined): string | undefined => {
+    if (!path) return undefined
+    let cur: unknown = raw
+    for (const k of path.split(".")) {
+      if (cur && typeof cur === "object" && k in (cur as Record<string, unknown>)) {
+        cur = (cur as Record<string, unknown>)[k]
+      } else {
+        return undefined
+      }
+    }
+    if (typeof cur === "string") return cur
+    if (typeof cur === "number") return String(cur)
+    return undefined
+  }
+  const title = read(tool.titleField) ?? tool.name
+  const desc = read(tool.descriptionField)
+  const thumb = toUrl(read(tool.thumbnailField) ?? read("thumbnail") ?? read("cover") ?? read("image"))
+  const meta = (tool.metaFields ?? [])
+    .map((k) => ({ k, v: read(k) }))
+    .filter((m) => !!m.v)
+
+  const downloads = urlFields
+    .map((f) => ({ key: f, url: toUrl(read(f)) }))
+    .filter((x) => !!x.url) as { key: string; url: string }[]
+
+  if (!downloads.length) {
+    return <CodeBlock data={data} />
+  }
+
+  const graded = downloads.map((d, i) => {
+    const key = d.key.toLowerCase()
+    let label = "Download"
+    if (key.includes("no_watermark") || key === downloads[0].key) label = i === 0 ? "Download Video (No WM)" : "Download Video"
+    else if (key.includes("watermark")) label = "Download Video (WM)"
+    else if (key.includes("music") || key.includes("audio") || key.includes("mp3")) label = "Download Audio"
+    else if (key.includes("sd")) label = "SD"
+    else if (key.includes("hd")) label = "HD"
+    return { ...d, label }
+  })
+
+  const copyUrl = (url: string) => {
+    navigator.clipboard.writeText(url).catch(() => {})
+    toast("Link disalin")
+  }
+
+  return (
+    <div className="nb-card overflow-hidden">
+      {thumb && (
+        <div className="aspect-video bg-black border-b-2 border-line overflow-hidden">
+          <img src={thumb} alt={title} className="w-full h-full object-cover" loading="lazy" />
+        </div>
+      )}
+      <div className="p-5">
+        <h3 className="font-head text-lg break-words">{title}</h3>
+        {desc && <p className="text-sm text-muted-fg mt-1 break-words line-clamp-2">{desc}</p>}
+        {meta.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {meta.map((m) => (
+              <span key={m.k} className="nb-chip text-[10px] leading-none">
+                {m.k}: <span className="text-cream ml-1">{m.v}</span>
+              </span>
+            ))}
+          </div>
+        )}
+        <div className="mt-5 flex flex-wrap gap-3">
+          {graded.map((d) => (
+            <a key={d.url} href={d.url} target="_blank" rel="noreferrer" download className="nb-btn inline-flex items-center gap-2 text-sm">
+              <ArrowDownTrayIcon className="w-4 h-4" />
+              {d.label}
+            </a>
+          ))}
+        </div>
+        <div className="mt-3 flex items-center gap-3">
+          <button onClick={() => copyUrl(graded[0].url)} className="text-xs border-2 border-line px-3 py-2 hover:bg-muted transition-colors flex items-center gap-1.5 cursor-pointer">
+            <ClipboardIcon className="w-4 h-4" /> Salin Link
+          </button>
+          {tool.fallbackToolId && (
+            <span className="text-xs text-muted-fg">
+              Gagal? Coba <code className="font-mono border border-line px-1 font-bold">{tool.fallbackToolId}</code>
+            </span>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

@@ -43,6 +43,9 @@ const PERKS = [
   { title: "Cepat & Ringan", desc: "Halaman muat di bawah 2 detik, bundle hanya ~108KB." },
 ]
 
+const POPULAR_IDS = ["tiktok", "ytmp3", "qr", "brat", "zodiak", "myip"]
+const POPULAR = POPULAR_IDS.map((id) => TOOLS.find((t) => t.id === id)).filter(Boolean) as typeof TOOLS
+
 function useScrollProgress(): number {
   const [p, setP] = useState(0)
   useEffect(() => {
@@ -139,6 +142,33 @@ export default function HomePage() {
                 </div>
               )}
             </div>
+          </div>
+        </section>
+
+        {/* POPULAR TOOLS */}
+        <section aria-label="Tool populer" className="py-6">
+          <div className="flex items-end justify-between mb-5">
+            <h2 className="font-head text-2xl">Tool Populer</h2>
+            <span className="nb-chip font-mono">paling sering dipakai</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {POPULAR.map((t) => {
+              const cat = CATEGORIES.find((c) => c.id === t.category)
+              const Icon = cat ? ICONS[cat.icon] ?? WrenchScrewdriverIcon : WrenchScrewdriverIcon
+              return (
+                <Link
+                  key={t.id}
+                  to="/tool/$id"
+                  params={{ id: t.id }}
+                  className="nb-card p-4 flex flex-col items-center text-center gap-2 cursor-pointer"
+                >
+                  <div className="w-10 h-10 grid place-items-center border-2 border-line bg-altar">
+                    <Icon className="w-5 h-5 text-cream" />
+                  </div>
+                  <span className="font-medium text-sm leading-tight">{t.name}</span>
+                </Link>
+              )
+            })}
           </div>
         </section>
 

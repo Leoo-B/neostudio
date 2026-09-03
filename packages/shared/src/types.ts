@@ -20,6 +20,7 @@ export type ToolRenderKind =
   | "quoteCard"
   | "keyValue"
   | "codeBlock"
+  | "downloadCard"
 
 export interface ToolDef {
   id: string
@@ -42,6 +43,14 @@ export interface ToolDef {
   descriptionField?: string
   linkField?: string
   metaFields?: string[]
+  /** downloader: primary download field (URL final) */
+  downloadField?: string
+  /** downloader: daftar field URL untuk tombol graded (audio/hd/sd/dll) */
+  downloadFields?: string[]
+  /** downloader: field thumbnail */
+  thumbnailField?: string
+  /** tool alternatif saat upstream gagal (mis. all-dl) */
+  fallbackToolId?: string
   /** gunakan client-side (tanpa API) */
   clientSide?: boolean
 }
