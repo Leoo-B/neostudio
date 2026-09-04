@@ -26,7 +26,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((t) => (
           <div
             key={t.id}
-            className="t-toast is-open nb-card pointer-events-auto bg-bg border-2 border-line px-5 py-3 flex items-center gap-2 text-sm font-medium"
+            className="t-toast is-open nb-card pointer-events-auto bg-bg border border-line px-5 py-3 flex items-center gap-2 text-sm font-medium"
           >
             <CheckCircleIcon className="w-5 h-5 text-cream shrink-0" />
             <span>{t.msg}</span>

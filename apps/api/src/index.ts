@@ -31,6 +31,7 @@ app.get("/api/catalog", (c) =>
       desc: t.desc,
       fields: t.fields,
       resultKind: t.resultKind,
+      renderKind: t.renderKind,
     })),
   })
 )

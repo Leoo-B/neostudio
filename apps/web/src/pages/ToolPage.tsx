@@ -41,7 +41,7 @@ export default function ToolPage() {
         <Header />
         <main className="max-w-6xl mx-auto px-4 py-16 text-center">
           <p className="font-head text-2xl">Tool tidak ditemukan</p>
-          <Link to="/" className="nb-btn inline-block mt-6">Kembali ke Home</Link>
+          <Link to="/tools" className="nb-btn inline-block mt-6">Kembali ke daftar Tools</Link>
         </main>
       </div>
     )
@@ -59,8 +59,8 @@ export default function ToolPage() {
     <div className="min-h-dvh bg-bg">
       <Header />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
-        <Link to="/" className="inline-flex items-center gap-1 text-sm text-muted-fg hover:text-cream transition-colors duration-150 mb-6">
-          ← Kembali ke home
+        <Link to="/tools" className="inline-flex items-center gap-1 text-sm text-muted-fg hover:text-cream transition-colors duration-150 mb-6">
+          ← Kembali ke daftar tools
         </Link>
 
         <h1 className="font-head text-3xl sm:text-4xl mb-1">{tool.name}</h1>
@@ -171,7 +171,7 @@ function PasteButton({ onPaste }: { onPaste: (v: string) => void }) {
           toast("Tidak bisa baca clipboard — tempel manual")
         }
       }}
-      className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 border-2 border-line hover:bg-muted transition-colors cursor-pointer"
+      className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 border border-line hover:bg-muted transition-colors cursor-pointer"
       title="Tempel dari clipboard"
     >
       <ClipboardIcon className="w-3.5 h-3.5" /> Tempel

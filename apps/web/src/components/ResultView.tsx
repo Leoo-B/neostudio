@@ -28,7 +28,7 @@ function ImageView({ tool, imageUrl }: { tool: ToolDef; imageUrl: string }) {
       <a href={imageUrl} download={`${tool.id}.png`} className="nb-btn inline-flex items-center gap-2 mb-4">
         <ArrowDownTrayIcon className="w-4 h-4" /> Unduh Gambar
       </a>
-      <img src={imageUrl} alt={tool.name} className="w-full h-auto border-2 border-line bg-black" />
+      <img src={imageUrl} alt={tool.name} className="w-full h-auto border border-line bg-black" />
     </div>
   )
 }
@@ -99,7 +99,7 @@ function CopyButton({ text }: { text: string }) {
         toast("Disalin ke clipboard")
         setTimeout(() => setCopied(false), 1200)
       }}
-      className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 border-2 border-line hover:bg-muted transition-colors duration-150 cursor-pointer"
+      className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 border border-line hover:bg-muted transition-colors duration-150 cursor-pointer"
     >
       <ClipboardDocumentIcon className="w-4 h-4" />
       {copied ? "Tersalin!" : "Salin"}
@@ -159,9 +159,9 @@ function ProfileCardView({ obj, tool }: { obj: Record<string, unknown>; tool: To
   return (
     <div className="nb-card p-5 sm:p-6 flex gap-5">
       {avatar ? (
-        <img src={avatar} alt={name} className="w-20 h-20 sm:w-24 sm:h-24 border-2 border-line bg-altar object-cover" />
+        <img src={avatar} alt={name} className="w-20 h-20 sm:w-24 sm:h-24 border border-line bg-altar object-cover" />
       ) : (
-        <div className="w-20 h-20 sm:w-24 sm:h-24 border-2 border-line bg-altar grid place-items-center">
+        <div className="w-20 h-20 sm:w-24 sm:h-24 border border-line bg-altar grid place-items-center">
           <UserCircleIcon className="w-10 h-10 text-muted-fg" />
         </div>
       )}
@@ -211,11 +211,11 @@ function ArticleList({ items, tool }: { items: Record<string, unknown>[]; tool: 
             className="nb-card block p-0 overflow-hidden group"
           >
             {img ? (
-              <div className="aspect-video bg-black border-b-2 border-line overflow-hidden">
+              <div className="aspect-video bg-black border-b border-line overflow-hidden">
                 <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
               </div>
             ) : (
-              <div className="aspect-video bg-altar border-b-2 border-line grid place-items-center text-muted-fg text-xs font-mono">
+              <div className="aspect-video bg-altar border-b border-line grid place-items-center text-muted-fg text-xs font-mono">
                 no image
               </div>
             )}
@@ -240,7 +240,7 @@ function MediaList({ items, tool, rawData }: { items: Record<string, unknown>[];
         <div className="nb-card p-4">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {fallback.slice(0, 12).map((src, i) => (
-              <a key={i} href={src} target="_blank" rel="noreferrer" className="block border-2 border-line bg-black">
+              <a key={i} href={src} target="_blank" rel="noreferrer" className="block border border-line bg-black">
                 <img src={src} alt="" className="w-full h-32 object-cover" loading="lazy" />
               </a>
             ))}
@@ -257,7 +257,7 @@ function MediaList({ items, tool, rawData }: { items: Record<string, unknown>[];
           const src = toUrl(pickStr(it, tool.imageField ?? "image") ?? pickStr(it, "url") ?? pickStr(it, "thumbnail"))
           if (!src) return null
           return (
-            <a key={i} href={src} target="_blank" rel="noreferrer" className="block border-2 border-line bg-black">
+            <a key={i} href={src} target="_blank" rel="noreferrer" className="block border border-line bg-black">
               <img src={src} alt="" className="w-full h-32 object-cover" loading="lazy" />
             </a>
           )
@@ -348,7 +348,7 @@ function DownloadCard({ tool, data }: { tool: ToolDef; data: unknown }) {
   return (
     <div className="nb-card overflow-hidden">
       {thumb && (
-        <div className="aspect-video bg-black border-b-2 border-line overflow-hidden">
+        <div className="aspect-video bg-black border-b border-line overflow-hidden">
           <img src={thumb} alt={title} className="w-full h-full object-cover" loading="lazy" />
         </div>
       )}
@@ -373,7 +373,7 @@ function DownloadCard({ tool, data }: { tool: ToolDef; data: unknown }) {
           ))}
         </div>
         <div className="mt-3 flex items-center gap-3">
-          <button onClick={() => copyUrl(graded[0].url)} className="text-xs border-2 border-line px-3 py-2 hover:bg-muted transition-colors flex items-center gap-1.5 cursor-pointer">
+          <button onClick={() => copyUrl(graded[0].url)} className="text-xs border border-line px-3 py-2 hover:bg-muted transition-colors flex items-center gap-1.5 cursor-pointer">
             <ClipboardIcon className="w-4 h-4" /> Salin Link
           </button>
           {tool.fallbackToolId && (
@@ -441,7 +441,7 @@ function QuizView({ obj, tool }: { obj: Record<string, unknown>; tool: ToolDef }
   const [revealed, setRevealed] = useState(false)
   return (
     <div className="nb-card p-5 sm:p-6 flex flex-col gap-4">
-      <div className="text-2xl sm:text-3xl font-head font-bold tracking-tight py-6 px-4 bg-muted text-center border-2 border-line">
+      <div className="text-2xl sm:text-3xl font-head font-bold tracking-tight py-6 px-4 bg-muted text-center border border-line">
         {question || "Soal tidak tersedia"}
       </div>
       <button type="button" className="nb-btn w-full sm:max-w-xs mx-auto" aria-expanded={revealed} onClick={() => setRevealed((v) => !v)}>

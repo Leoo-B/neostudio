@@ -1,0 +1,78 @@
+// SERVER-ONLY — jangan pernah diimpor dari kode web (bocor ke bundle klien).
+// Peta tool -> upstream. Bisa dioverride via env agar domain tidak hardcoded.
+import type { ToolDef, ToolUpstream } from "./types"
+
+const SIPUTZX = process.env.SIPUTZX_BASE ?? "https://api.siputzx.my.id"
+const KYZZ = process.env.KYZZNEKOO_BASE ?? "https://api.kyzznekoo.my.id"
+
+export const UPSTREAM: Record<string, ToolUpstream> = {
+  qr: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/tools/v2/qr" },
+  myip: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/tools/ip" },
+  obfuscate: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/tools/obfuscate" },
+  npm: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/search/npm" },
+  "github-search": { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/search/github" },
+  "upload-imgbb": { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/upload/imgbb" },
+  "upload-github": { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/upload/github" },
+  kodepos: { source: "siputzx", baseUrl: SIPUTZX, path: "/api/tools/kodepos" },
+  tempmail: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/tools/tmpmail/v2/create" },
+  brat: { source: "siputzx", baseUrl: SIPUTZX, path: "/api/m/brat" },
+  balogo: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/maker/balogo" },
+  iqc: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/image/iqc" },
+  ppcouple: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/image/ppcouple" },
+  "story-ig": { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/canvas/v2/storyig" },
+  "fake-ig": { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/canvas/v2/fake-ig" },
+  wanted: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/editor/wanted" },
+  wasted: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/editor/wasted" },
+  "upscale-uhd": { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/upscale/v5/uhd" },
+  hdfoto: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/upscale/hdfoto" },
+  sertifikat: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/image/sertifikat" },
+  faceblur: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/editor/faceblur" },
+  removebg: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/tools/rbg" },
+  tiktok: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/downloader/v2/tiktok" },
+  instagram: { source: "siputzx", baseUrl: SIPUTZX, path: "/api/d/sssinstagram" },
+  facebook: { source: "siputzx", baseUrl: SIPUTZX, path: "/api/d/facebook" },
+  capcut: { source: "siputzx", baseUrl: SIPUTZX, path: "/api/d/capcut" },
+  gdrive: { source: "siputzx", baseUrl: SIPUTZX, path: "/api/d/gdrive" },
+  savefrom: { source: "siputzx", baseUrl: SIPUTZX, path: "/api/d/savefrom" },
+  snackvideo: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/downloader/snackvideo" },
+  "spotify-dl": { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/downloader/spotify" },
+  ytmp3: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/downloader/ytmp3" },
+  "all-dl": { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/downloader/all" },
+  "berita-cnn": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/berita/cnn" },
+  "berita-kompas": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/berita/kompas" },
+  "berita-liputan6": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/berita/liputan6" },
+  "berita-antara": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/berita/antara" },
+  "berita-suara": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/berita/suara" },
+  "berita-sindonews": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/berita/sindonews" },
+  "berita-merdeka": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/berita/merdeka" },
+  "berita-tribun": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/berita/tribunnews" },
+  "berita-cnbc": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/berita/cnbcindonesia" },
+  bmkg: { source: "siputzx", baseUrl: SIPUTZX, path: "/api/info/bmkg" },
+  jadwaltv: { source: "siputzx", baseUrl: SIPUTZX, path: "/api/info/jadwaltv" },
+  sholat: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/search/sholat" },
+  "tebak-gambar": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/games/tebakgambar" },
+  family100: { source: "siputzx", baseUrl: SIPUTZX, path: "/api/games/family100" },
+  maths: { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/game/maths" },
+  "susun-kata": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/games/susunkata" },
+  "cak-lontong": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/games/caklontong" },
+  "asah-otak": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/games/asahotak" },
+  "quote-anime": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/r/quotesanime" },
+  "blue-archive": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/r/blue-archive" },
+  "arti-nama": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/primbon/artinama" },
+  kecocokan: { source: "siputzx", baseUrl: SIPUTZX, path: "/api/primbon/kecocokan_nama_pasangan" },
+  zodiak: { source: "siputzx", baseUrl: SIPUTZX, path: "/api/primbon/zodiak" },
+  "yt-search": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/s/youtube" },
+  "pinterest-search": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/s/pinterest" },
+  resep: { source: "siputzx", baseUrl: SIPUTZX, path: "/api/s/resep" },
+  "apple-music": { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/search/applemusic" },
+  "spotify-search": { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/search/v2/spotify" },
+  "grup-wa": { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/search/group" },
+  "stalk-github": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/stalk/github" },
+  "stalk-twitter": { source: "siputzx", baseUrl: SIPUTZX, path: "/api/stalk/twitter" },
+  "stalk-threads": { source: "kyzznekoo", baseUrl: KYZZ, path: "/api/stalker/threads" },
+}
+
+/** gabungkan katalog publik dengan info upstream (hanya untuk server) */
+export function withUpstream(tools: ToolDef[]): (ToolDef & ToolUpstream)[] {
+  return tools.map((t) => ({ ...t, ...UPSTREAM[t.id] }))
+}

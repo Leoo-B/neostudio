@@ -1,5 +1,8 @@
 import type { Context } from "hono"
-import { TOOLS } from "@neostudio/shared"
+import { TOOLS, type ToolDef, type ToolUpstream } from "@neostudio/shared"
+import { UPSTREAM } from "@neostudio/shared/upstream"
+
+type ToolFull = ToolDef & ToolUpstream
 
 const TOOL_TIMEOUT_MS = 25_000
 const RATE_LIMIT_WINDOW_MS = 60_000
@@ -56,21 +59,20 @@ export function buildQuery(params: Record<string, unknown>): string {
 export function warmCache() {
   // pre-cache endpoint tanpa parameter (berita, info, games primbon select, dsb)
   for (const t of TOOLS) {
-    if (t.fields.length === 0 && t.method !== "POST") {
-      const cacheKey = `GET:${t.id}:`
-      if (!cache.has(cacheKey)) {
-        // fire-and-forget warm — tangani reject agar tak crash process
-        void callUpstream(t, "GET", {})
-          .then((r) => {
-            if (r) cache.set(cacheKey, { ...r, at: Date.now() })
-          })
-          .catch(() => {})
-      }
+    const up = UPSTREAM[t.id]
+    if (!up || t.fields.length > 0 || up.method === "POST") continue
+    const cacheKey = `GET:${t.id}:`
+    if (!cache.has(cacheKey)) {
+      void callUpstream({ ...t, ...up }, "GET", {})
+        .then((r) => {
+          if (r) cache.set(cacheKey, { ...r, at: Date.now() })
+        })
+        .catch(() => {})
     }
   }
 }
 
-async function callUpstream(t: (typeof TOOLS)[number], method: "GET" | "POST", params: Record<string, unknown>) {
+async function callUpstream(t: ToolFull, method: "GET" | "POST", params: Record<string, unknown>) {
   const qs = method === "GET" ? buildQuery(params) : ""
   const url = t.baseUrl + t.path + qs
   const init: RequestInit = { method }
@@ -119,7 +121,7 @@ function softError(data: unknown): string | null {
   return null
 }
 
-function normalize(t: (typeof TOOLS)[number], ct: string, body: ArrayBuffer, status: number) {
+function normalize(t: ToolFull, ct: string, body: ArrayBuffer, status: number) {
   const isImage = ct.startsWith("image/")
   const isJson = ct.includes("json")
   const kind = isImage ? "image" : isJson ? "json" : "text"
@@ -161,6 +163,11 @@ export async function proxyTool(c: Context, method: "GET" | "POST", params: Reco
   const t = TOOLS.find((x) => x.id === id)
   if (!t) return c.json({ ok: false, status: 404, error: "tool not found" }, 404)
 
+  const up = UPSTREAM[t.id]
+  if (!up) return c.json({ ok: false, status: 500, error: "upstream config missing" }, 500)
+
+  const full: ToolFull = { ...t, ...up }
+
   const ip = getClientIp(c)
   if (!checkRate(ip)) {
     return c.json({ ok: false, status: 429, error: "rate limit — coba lagi nanti" }, 429)
@@ -171,17 +178,17 @@ export async function proxyTool(c: Context, method: "GET" | "POST", params: Reco
   if (method === "GET" && Object.keys(params).length === 0) {
     const hit = cache.get(cacheKey)
     if (hit && Date.now() - hit.at < CACHE_TTL_MS) {
-      const norm = normalize(t, hit.contentType, hit.body, hit.status)
+      const norm = normalize(full, hit.contentType, hit.body, hit.status)
       return c.json({ ...norm, cached: true })
     }
   }
 
   try {
-    const r = await callUpstream(t, method, params)
+    const r = await callUpstream(full, method, params)
     if (r.status >= 200 && r.status < 300 && method === "GET" && Object.keys(params).length === 0) {
       cache.set(cacheKey, { ...r, at: Date.now() })
     }
-    return c.json(normalize(t, r.contentType, r.body, r.status))
+    return c.json(normalize(full, r.contentType, r.body, r.status))
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e)
     const isAbort = msg.toLowerCase().includes("aborted")

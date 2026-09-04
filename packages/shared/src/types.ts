@@ -30,10 +30,6 @@ export interface ToolDef {
   category: CategoryId
   name: string
   desc: string
-  source: "siputzx" | "kyzznekoo" | "internal"
-  path: string
-  baseUrl: string
-  method?: "GET" | "POST"
   fields: ToolField[]
   resultKind: ToolResultKind
   /** bagaimana hasil harus ditampilkan di UI (default: fallback = codeBlock) */
@@ -65,6 +61,16 @@ export interface ToolDef {
   /** gunakan client-side (tanpa API) */
   clientSide?: boolean
 }
+
+/** info upstream — SERVER-ONLY, tidak boleh masuk bundle web */
+export interface ToolUpstream {
+  source: "siputzx" | "kyzznekoo" | "internal"
+  baseUrl: string
+  path: string
+  method?: "GET" | "POST"
+}
+
+export type ToolFull = ToolDef & ToolUpstream
 
 export type CategoryId =
   | "tools"

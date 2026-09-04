@@ -11,7 +11,8 @@ export default {
         oncream: "#0B0B0F",
         fg: "#F7F5F2",
         muted: { DEFAULT: "#2A2A33", fg: "#A9A9B3" },
-        line: "#F7F5F2",
+        line: "rgba(247,245,242,0.10)",
+        "line-strong": "rgba(247,245,242,0.18)",
         danger: "#F8716F",
       },
       fontFamily: {
@@ -20,15 +21,15 @@ export default {
         mono: ["JetBrains Mono", "monospace"],
       },
       boxShadow: {
-        hard: "4px 4px 0 0 #F5DEB3",
-        "hard-sm": "3px 3px 0 0 #F5DEB3",
-        "hard-lg": "7px 7px 0 0 #F5DEB3",
+        soft: "0 1px 2px rgba(0,0,0,0.4)",
+        lift: "0 12px 32px rgba(0,0,0,0.45)",
+        glow: "0 0 24px rgba(245,222,179,0.12)",
+      },
+      borderRadius: {
+        nb: "12px",
       },
       transitionTimingFunction: {
         smooth: "cubic-bezier(0.22, 1, 0.36, 1)",
-      },
-      borderRadius: {
-        nb: "0px",
       },
     },
   },

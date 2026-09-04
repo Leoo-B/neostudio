@@ -5,79 +5,61 @@
 ---
 
 **Project:** neostudio
-**Generated:** 2026-09-02
+**Updated:** 2026-09-04
 **Category:** Developer Tool / Multi-tool Platform ("Swiss Army Knife")
 
 ---
 
 ## Global Rules
 
-### Style: Dark Neobrutalism
+### Style: Clean Modern Dark
 
-Kombinasi dark mode (OLED-friendly) dengan estetika neobrutalism modern:
-bg hitam pekat, border tebal putih/krem solid, shadow keras tanpa blur (hard offset), sudut siku/geometrik, warna aksen cream. **Tanpa emoji** sebagai ikon — wajib SVG modern (Heroicons).
+Dark base (OLED-friendly) dengan estetika modern minimalis:
+bg hitam pekat, border tipis 1px semi-transparan, radius seragam 12px, shadow lembut (blur), satu aksen cream `#F5DEB3` yang dipakai halus (link, CTA, highlight). **Bukan neobrutalism** (tanpa hard offset shadow, tanpa border tebal 2px) dan **bukan glassmorphism**.
 
-**Keywords:** dark, OLED, hard shadow, thick border, punchy, bold, geometric, cream accent, high contrast, playful-but-functional
+**Keywords:** dark, minimal, thin border, soft shadow, rounded, clean, cream accent, humanist, calm
 
 ### Color Palette
 
-| Role | Hex | CSS Variable |
-|------|-----|--------------|
-| Background | `#0B0B0F` | `--color-background` |
-| Background Alt | `#111117` | `--color-bg-alt` |
-| Foreground | `#F7F5F2` | `--color-foreground` |
-| Card | `#15151C` | `--color-card` |
-| Card Foreground | `#F7F5F2` | `--color-card-foreground` |
-| Accent (CTA) | `#F5DEB3` | `--color-accent` |
-| On Accent | `#0B0B0F` | `--color-on-accent` |
-| Primary | `#F5DEB3` | `--color-primary` |
-| On Primary | `#0B0B0F` | `--color-on-primary` |
-| Secondary Border | `#F7F5F2` | `--color-secondary` |
-| Muted | `#2A2A33` | `--color-muted` |
-| Muted Foreground | `#A9A9B3` | `--color-muted-foreground` |
-| Border | `#F7F5F2` (solid 2px) | `--color-border` |
-| Destructive | `#F8716F` | `--color-destructive` |
-| On Destructive | `#0B0B0F` | `--color-on-destructive` |
-| Ring / Focus | `#F5DEB3` | `--color-ring` |
+| Role | Hex | Tailwind |
+|------|-----|----------|
+| Background | `#0B0B0F` | `bg-bg` |
+| Background Alt | `#111117` | `bg-altar` |
+| Foreground | `#F7F5F2` | `text-fg` |
+| Card | `#15151C` | `bg-card` |
+| Accent (CTA) | `#F5DEB3` | `text-cream` / `bg-cream` |
+| On Accent | `#0B0B0F` | `text-oncream` |
+| Muted | `#2A2A33` | `bg-muted` |
+| Muted Foreground | `#A9A9B3` | `text-muted-fg` |
+| Border (line) | `rgba(247,245,242,0.10)` | `border-line` |
+| Border (strong) | `rgba(247,245,242,0.18)` | `border-line-strong` |
+| Destructive | `#F8716F` | `text-danger` |
 
-**Color Notes:** Dark pekat + cream berpendar pengganti neon. Border putih/krem tebal solid (2px) — ciri neobrutalism.
+**Color Notes:** Aksen cream dipakai halus — tidak boleh jadi hard shadow atau border tebal.
 
 ### Typography
 
 - **Heading Font:** Space Grotesk (geometris, bold, modern)
 - **Body Font:** Inter (bersih, mudah dibaca)
 - **Mono (kode/JSON):** JetBrains Mono
-- **Mood:** modern, bold, geometric, developer, punchy
 - **Google Fonts:**
 ```css
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 ```
 
-### Spacing
-
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--space-xs` | `4px` / `.25rem` | tight gaps |
-| `--space-sm` | `8px` / `.5rem` | icon gaps |
-| `--space-md` | `16px` / `1rem` | standard padding |
-| `--space-lg` | `24px` / `1.5rem` | section padding |
-| `--space-xl` | `32px` / `2rem` | large gaps |
-| `--space-2xl` | `48px` / `3rem` | section margins |
-| `--space-3xl` | `64px` / `4rem` | hero padding |
-
-### Neobrutalism Signature (border + hard shadow)
+### Signature (border tipis + shadow lembut)
 
 ```css
 :root {
-  --border-w: 2px;
-  --border-color: #F7F5F2;
-  --shadow-hard: 4px 4px 0 0 #F5DEB3;   /* hard offset, no blur */
-  --shadow-hard-sm: 3px 3px 0 0 #F5DEB3;
-  --radius: 0px;                          /* sudut siku (atau 8px jika minta) */
+  --border-w: 1px;
+  --border-color: rgba(247, 245, 242, 0.10);
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-lift: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --radius: 12px;
 }
 ```
 
-Rule: **tanpa blur shadow**, tebal jelas, warna aksen cream sebagai shadow di atas hitam.
+Rule: border tipis 1px, radius 12px, shadow blur lembut. Tidak ada hard offset shadow, tidak ada gradient neon.
 
 ---
 
@@ -88,30 +70,29 @@ Rule: **tanpa blur shadow**, tebal jelas, warna aksen cream sebagai shadow di at
 .btn-primary {
   background: #F5DEB3;        /* cream */
   color: #0B0B0F;
-  border: 2px solid #F7F5F2;
-  border-radius: 0;           /* siku */
+  border: 1px solid transparent;
+  border-radius: 12px;
   padding: 12px 24px;
-  font-weight: 700;
-  box-shadow: 4px 4px 0 0 #F7F5F2;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.4);
   cursor: pointer;
-  transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 150ms;
+  transition: transform 200ms cubic-bezier(0.22,1,0.36,1), box-shadow 200ms, background 200ms;
 }
-.btn-primary:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 0 #F7F5F2; }
-.btn-primary:active { transform: translate(2px,2px); box-shadow: 0 0 0 0 #F7F5F2; }
+.btn-primary:hover { background: #F8E7C4; box-shadow: 0 8px 24px rgba(245,222,179,0.18); }
+.btn-primary:active { transform: translateY(1px); }
 ```
 
 ### Card (tool / kategori)
 ```css
 .card {
   background: #15151C;
-  border: 2px solid #F7F5F2;
-  border-radius: 0;
+  border: 1px solid rgba(247,245,242,0.10);
+  border-radius: 12px;
   padding: 24px;
-  box-shadow: 4px 4px 0 0 #F5DEB3;   /* cream hard shadow */
-  cursor: pointer;
-  transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 150ms;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  transition: transform 200ms cubic-bezier(0.22,1,0.36,1), box-shadow 200ms, border-color 200ms;
 }
-.card:hover { transform: translate(-3px,-3px); box-shadow: 7px 7px 0 0 #F5DEB3; }
+.card:hover { border-color: rgba(245,222,179,0.25); box-shadow: 0 12px 32px rgba(0,0,0,0.45); }
 ```
 
 ### Input
@@ -119,62 +100,71 @@ Rule: **tanpa blur shadow**, tebal jelas, warna aksen cream sebagai shadow di at
 .input {
   background: #111117;
   color: #F7F5F2;
-  border: 2px solid #F7F5F2;
-  border-radius: 0;
+  border: 1px solid rgba(247,245,242,0.14);
+  border-radius: 12px;
   padding: 12px 16px;
   font-size: 16px;
 }
-
-.input:focus {
-  outline: none;
-  border-color: #F5DEB3;
-  box-shadow: 3px 3px 0 0 #F5DEB3;
-}
+.input:focus { outline: none; border-color: rgba(245,222,179,0.55); box-shadow: 0 0 0 3px rgba(245,222,179,0.12); }
 ```
 
-### Tag/Chip
+### Chip / Filter
 ```css
 .chip {
-  background: #111117;
-  border: 2px solid #F7F5F2;
-  color: #F7F5F2;
-  padding: 4px 12px;
-  font-weight: 600;
-  box-shadow: 2px 2px 0 0 #F5DEB3;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(247,245,242,0.12);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-weight: 500;
   cursor: pointer;
 }
+.chip:hover { background: rgba(245,222,179,0.08); border-color: rgba(245,222,179,0.35); color: #F5DEB3; }
+.chip.is-active { background: rgba(245,222,179,0.12); border-color: rgba(245,222,179,0.5); color: #F5DEB3; }
 ```
 
 ---
 
-## Style Guidelines
+## Motion (GSAP)
 
-**Style: Dark Neobrutalism** — bg `#0B0B0F`, card `#15151C`, border putih `#F7F5F2` (2px solid), hard shadow cream `#F5DEB3` (4px offset, **tanpa blur**), sudut siku.
+- `gsap` + `ScrollTrigger` terdaftar di `apps/web/src/lib/gsap.ts`.
+- **Counter animasi** (0→64): `AnimatedCounter` — ScrollTrigger `once`, `snap: 1`, durasi 1.4s, ease `power2.out`.
+- **Reveal scroll**: `Reveal` — fade + translateY + blur → clear, ScrollTrigger `start: top 88%`, durasi 0.6s, ease `power3.out`.
+- **Hover lift**: class CSS `nb-lift` (translateY(-3px)) — tanpa JS per elemen.
+- **Accordion FAQ**: transisi CSS `grid-template-rows 0fr→1fr` + rotate chevron. Gaya braikter: satu item terbuka, border aktif cream.
+- **Hormati** `prefers-reduced-motion: reduce` (guard di `AnimatedCounter` & `Reveal`).
 
-**Key Effects (dari transitions-dev / transitions-polish):**
-- Hovernya `translate(-2px,-2px)` + shadow membesar — kesan "diangkat" khas neobrutalism
-- Transisi 150-300ms, easing `cubic-bezier(0.22,1,0.36,1)` (smooth-out)
-- Gunakan motion tokens dari `transitions-polish/_root.css` (salon di repo root)
+---
 
-### Page Pattern
+## Page Pattern
 
-**Pattern: Dashboard / Toolbox Launchpad**
-- **CTA:** Kotak pencarian besar + 8 kartu kategori
-- **Section order:** Hero (logo + tagline + search) → "cara pakai" strip (3-4 langkah) → grid 8 kategori → tool populer
-- **Anti-pattern dilarang:** emoji sebagai ikon (pakai Heroicons SVG), shadow blur terlalu lembut, gradient neon, layout shift saat hover
+**Pattern: Landing → Katalog → Detail**
+- `/` Home (landing): hero + search + CTA + kategori (tab filter + preview) + FAQ. **Tidak** menampilkan semua tool di home.
+- `/tools`: search + sticky filter kategori + grid penuh.
+- `/tool/:id`: form + hasil (konsisten pakai token di atas).
+- **Anti-pattern dilarang:** emoji sebagai ikon (pakai Heroicons SVG), hard shadow neobrutalism, glassmorphism, gradient neon, tool grid penuh di home.
 
 ---
 
 ## Anti-Patterns (Do NOT Use)
 
 - ❌ Emojis as icons — wajib SVG (Heroicons)
-- ❌ Neon/bright gradients — ganti dengan cream `#F5DEB3` + hard shadow
-- ❌ Soft feathery shadows — ganti hard offset shadow
-- ❌ Rounded corners berlebihan (kecuali diminta) — default sudut siku
+- ❌ Neon/bright gradients
+- ❌ Hard offset shadow (neobrutalism) — `4px 4px 0 0 #F5DEB3` dilarang
+- ❌ Border tebal 2px solid — pakai 1px semi-transparan
+- ❌ Glassmorphism (blur tebal + transparansi tinggi) — cukup `bg-bg/85` + blur tipis di header
 - ❌ Light mode default
 - ❌ Missing `cursor:pointer` pada elemen klik
 - ❌ Low contrast text — min 4.5:1
-- ❌ Instan state change tanpa transisi — selalu 150-300ms
+- ❌ Instan state change tanpa transisi — selalu 200-300ms
+
+---
+
+## Keamanan: Info API Tidak Boleh Bocor
+
+- `packages/shared/src/tools.ts` hanya berisi **metadata publik** (id, category, name, desc, fields, renderKind).
+- Info upstream (`baseUrl`, `path`, `source`, `method`) ada di `packages/shared/src/upstream.ts` — **server-only**, tidak boleh diimport dari kode web.
+- API (`apps/api`) memakai `withUpstream()` / `UPSTREAM[id]` untuk membangun URL.
+- `SIPUTZX_BASE` / `KYZZNEKOO_BASE` env dapat menimpa domain upstream.
 
 ---
 
@@ -182,10 +172,11 @@ Rule: **tanpa blur shadow**, tebal jelas, warna aksen cream sebagai shadow di at
 
 - [ ] No emojis as icons (pakai Heroicons SVG)
 - [ ] `cursor-pointer` pada semua elemen klik
-- [ ] Hard offset shadow (`-px`, no blur), border tebal 2px
-- [ ] Hover `translate` + shadow membesar, 150-300ms
-- [ ] `prefers-reduced-motion` dihormati (guard di semua transition)
+- [ ] Border 1px semi-transparan, radius 12px, shadow lembut
+- [ ] Transisi 200-300ms, easing `cubic-bezier(0.22,1,0.36,1)`
+- [ ] `prefers-reduced-motion` dihormati (GSAP guard)
 - [ ] text contrast ≥ 4.5:1
 - [ ] Focus states visible (ring cream `#F5DEB3`)
 - [ ] Responsive: 375 / 768 / 1024 / 1440 px
 - [ ] No horizontal scroll on mobile
+- [ ] Nama/domain API upstream tidak muncul di bundle web (`grep -c siputzx dist`)

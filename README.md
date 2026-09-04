@@ -11,7 +11,7 @@ Dari unduh video TikTok, generate QR, cek berita, edit gambar, sampai main tebak
 | **Frontend** | React 18 + Vite + Tailwind + TanStack Router/Query + Heroicons |
 | **Backend** | Hono (proxy ke upstream API, rate limit, cache, normalisasi galat) |
 | **Shared** | TypeScript + Zod (katalog tool, skema, tipe) |
-| **Desain** | Dark neobrutalism — bg `#0B0B0F`, aksen cream `#F5DEB3`, border tebal, hard shadow |
+| **Desain** | Clean modern dark — bg `#0B0B0F`, border 1px, radius 12px, shadow lembut, aksen cream `#F5DEB3`; animasi GSAP |
 
 ## Struktur
 
@@ -71,15 +71,14 @@ pnpm --filter @neostudio/api test     # test proxy
 ## Cara kerja
 
 1. Frontend memanggil `POST /api/run/:toolId` dengan `{ params }`
-2. `apps/api` mencari definisi tool di `packages/shared`, memanggil upstream, lalu menormalisasi respons ke `{ ok, status, kind, data | imageUrl }`
+2. `apps/api` mencari definisi tool di `packages/shared` (katalog publik + peta upstream server-only), memanggil upstream, lalu menormalisasi respons ke `{ ok, status, kind, data | imageUrl }`
 3. Frontend merender hasil sesuai `renderKind` tool — `downloadCard`, `articleList`, `profileCard`, `keyValue`, `mediaList`, `resultList`, `quoteCard`, `image`, atau fallback `codeBlock`
 
 Semua panggilan upstream lewat proxy: endpoint upstream tidak pernah masuk bundle klien, dan rate limit (60 req/menit/IP) plus cache 1 menit ditangani di server.
 
 ## Sumber API
 
-- [siputzx](https://api.siputzx.my.id) — 197 endpoint publik
-- [kyzznekoo](https://api.kyzznekoo.my.id) — 225 endpoint publik
+Katalog tool memakai beberapa API publik pihak ketiga. Nama/domain sumber **tidak diekspos ke klien** — semua dipetakan di `packages/shared/src/upstream.ts` (server-only) dan bisa dioverride via env `SIPUTZX_BASE` / `KYZZNEKOO_BASE`.
 
 Tool yang upstream-nya sedang gangguan menampilkan pesan galat ramah dan menyarankan tool alternatif.
 

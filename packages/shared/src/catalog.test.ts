@@ -1,5 +1,6 @@
 import { test, assert } from "vitest"
 import { CATEGORIES, TOOLS } from "./index"
+import { UPSTREAM } from "./upstream"
 
 test("katalog memiliki tepat 8 kategori", () => {
   assert.equal(CATEGORIES.length, 8)
@@ -13,14 +14,18 @@ test("setiap kategori punya tool minimal 1", () => {
   }
 })
 
-test("setiap tool punya id unik, path, baseUrl, dan resultKind valid", () => {
+test("setiap tool punya id unik dan UPSTREAM cover semua id", () => {
   const ids = new Set<string>()
   for (const t of TOOLS) {
     assert.ok(!ids.has(t.id), `duplikat id: ${t.id}`)
     ids.add(t.id)
-    assert.ok(t.path.startsWith("/"), `path ${t.id} harus mulai dengan /`)
-    assert.ok(t.baseUrl.startsWith("http"), `baseUrl ${t.id} harus http`)
     assert.ok(["image", "text", "json", "file"].includes(t.resultKind), `resultKind ${t.id} invalid`)
+    const u = UPSTREAM[t.id]
+    assert.ok(u, `UPSTREAM tidak punya ${t.id}`)
+    assert.ok(u.path.startsWith("/"), `path ${t.id} harus mulai dengan /`)
+    if (u.source !== "internal") {
+      assert.ok(u.baseUrl.startsWith("http"), `baseUrl ${t.id} harus http`)
+    }
   }
 })
 
@@ -49,8 +54,8 @@ test("semua downloader pakai downloadCard + punya downloadField", () => {
 
 test("maths sudah pakai kyzznekoo dengan param level + renderKind quiz", () => {
   const m = TOOLS.find((t) => t.id === "maths")!
-  assert.equal(m.source, "kyzznekoo")
-  assert.equal(m.path, "/api/game/maths")
+  assert.equal(UPSTREAM["maths"].source, "kyzznekoo")
+  assert.equal(UPSTREAM["maths"].path, "/api/game/maths")
   assert.equal(m.renderKind, "quiz")
   const level = m.fields.find((f) => f.name === "level")
   assert.ok(level && level.type === "select" && (level.options?.length ?? 0) > 0, "maths wajib punya param level select")
