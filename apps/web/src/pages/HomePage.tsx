@@ -5,6 +5,7 @@ import { CATEGORIES, TOOLS } from "@neostudio/shared"
 import { ToolCard, CATEGORY_ICONS } from "../components/ToolCard"
 import { FAQ } from "../components/FAQ"
 import { Reveal } from "../components/Reveal"
+import { AnimatedCounter } from "../components/AnimatedCounter"
 
 function useScrollProgress(): number {
   const [p, setP] = useState(0)
@@ -52,7 +53,7 @@ export default function HomePage() {
 
   const progress = useScrollProgress()
   const activeCat = CATEGORIES.find((c) => c.id === selectedTab) ?? CATEGORIES[0]
-  const toolsInTab = TOOLS.filter((t) => t.category === selectedTab).slice(0, 12)
+  const toolsInTab = TOOLS.filter((t) => t.category === selectedTab).slice(0, 3)
 
   return (
     <div className="min-h-dvh bg-bg" onKeyDown={onKeyDown}>
@@ -64,7 +65,7 @@ export default function HomePage() {
         {/* Hero */}
         <section className="pt-16 pb-10 text-center">
           <div className="inline-block nb-card px-4 py-1.5 mb-6 rounded-full">
-            <span className="text-[11px] font-mono uppercase tracking-widest text-cream">64 tools · 8 kategori · gratis</span>
+            <span className="text-[11px] font-mono uppercase tracking-widest text-cream">gratis · tanpa daftar · tanpa iklan</span>
           </div>
           <h1 className="font-head text-4xl sm:text-6xl leading-tight">
             neostudio<span className="text-cream">.</span>
@@ -73,6 +74,21 @@ export default function HomePage() {
             Satu tempat untuk 64+ alat digital — unduh video, generate QR, cek berita, edit gambar, sampai primbon.
             Semua gratis, tanpa daftar, tanpa iklan pop-up.
           </p>
+          <div className="mt-8 flex items-center justify-center gap-6 sm:gap-10 text-cream">
+            <div className="text-center">
+              <div className="font-head text-4xl sm:text-5xl leading-none">
+                <AnimatedCounter to={64} />
+              </div>
+              <div className="mt-1 text-[11px] font-mono uppercase tracking-widest text-muted-fg">tools</div>
+            </div>
+            <div className="h-10 w-px bg-line" aria-hidden />
+            <div className="text-center">
+              <div className="font-head text-4xl sm:text-5xl leading-none">
+                <AnimatedCounter to={8} />
+              </div>
+              <div className="mt-1 text-[11px] font-mono uppercase tracking-widest text-muted-fg">kategori</div>
+            </div>
+          </div>
           <div className="mt-8 max-w-xl mx-auto relative">
             <MagnifyingGlassIcon className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-muted-fg pointer-events-none" />
             <input
@@ -130,7 +146,7 @@ export default function HomePage() {
                 Lihat semua <ChevronRightIcon className="w-4 h-4" />
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {toolsInTab.map((t) => (
                 <ToolCard key={t.id} tool={t} icon={CATEGORY_ICONS[activeCat.icon] ?? CATEGORY_ICONS.WrenchScrewdriverIcon} />
               ))}
