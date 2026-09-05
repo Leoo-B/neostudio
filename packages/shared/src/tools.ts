@@ -123,6 +123,9 @@ export const TOOLS: ToolDef[] = [
     fields: [],
     resultKind: "json",
     renderKind: "keyValue",
+    ...P("data"),
+    titleField: "email",
+    metaFields: ["expiresAt", "createdAt", "durationMinutes"],
   },
 
   {
@@ -433,10 +436,9 @@ export const TOOLS: ToolDef[] = [
     renderKind: "articleList",
     ...P("data"),
     titleField: "title",
-    descriptionField: "image_thumbnail",
-    imageField: "image_thumbnail",
+    imageField: "image",
     linkField: "link",
-    metaFields: ["slug", "image_full"],
+    metaFields: ["category"],
   },
 
   {
@@ -448,6 +450,10 @@ export const TOOLS: ToolDef[] = [
     resultKind: "json",
     renderKind: "articleList",
     ...P("data"),
+    titleField: "title",
+    imageField: "image",
+    linkField: "link",
+    metaFields: ["category"],
   },
 
   {
@@ -459,6 +465,10 @@ export const TOOLS: ToolDef[] = [
     resultKind: "json",
     renderKind: "articleList",
     ...P("data"),
+    titleField: "title",
+    imageField: "image",
+    linkField: "link",
+    metaFields: ["category"],
   },
 
   {
@@ -470,6 +480,10 @@ export const TOOLS: ToolDef[] = [
     resultKind: "json",
     renderKind: "articleList",
     ...P("data"),
+    titleField: "title",
+    imageField: "image",
+    linkField: "link",
+    metaFields: ["category"],
   },
 
   {
@@ -481,6 +495,10 @@ export const TOOLS: ToolDef[] = [
     resultKind: "json",
     renderKind: "articleList",
     ...P("data"),
+    titleField: "title",
+    imageField: "image",
+    linkField: "link",
+    metaFields: ["category"],
   },
 
   {
@@ -492,6 +510,10 @@ export const TOOLS: ToolDef[] = [
     resultKind: "json",
     renderKind: "articleList",
     ...P("data"),
+    titleField: "title",
+    imageField: "image",
+    linkField: "link",
+    metaFields: ["category"],
   },
 
   {
@@ -503,6 +525,10 @@ export const TOOLS: ToolDef[] = [
     resultKind: "json",
     renderKind: "articleList",
     ...P("data"),
+    titleField: "title",
+    imageField: "image",
+    linkField: "link",
+    metaFields: ["category"],
   },
 
   {
@@ -514,6 +540,10 @@ export const TOOLS: ToolDef[] = [
     resultKind: "json",
     renderKind: "articleList",
     ...P("data"),
+    titleField: "title",
+    imageField: "image",
+    linkField: "link",
+    metaFields: ["category"],
   },
 
   {
@@ -525,16 +555,24 @@ export const TOOLS: ToolDef[] = [
     resultKind: "json",
     renderKind: "articleList",
     ...P("data"),
+    titleField: "title",
+    imageField: "image",
+    linkField: "link",
+    metaFields: ["category"],
   },
 
   {
     id: "bmkg",
     category: "news",
     name: "BMKG",
-    desc: "Info cuaca & gempa BMKG",
+    desc: "Info BMKG terkini",
     fields: [],
     resultKind: "json",
     renderKind: "resultList",
+    ...P("data.terkini.Infogempa.gempa"),
+    titleField: "Wilayah",
+    descriptionField: "Dirasakan",
+    metaFields: ["Tanggal", "Jam", "Magnitude", "Kedalaman", "Potensi"],
   },
 
   {
@@ -545,6 +583,9 @@ export const TOOLS: ToolDef[] = [
     fields: [],
     resultKind: "json",
     renderKind: "resultList",
+    ...P("data"),
+    titleField: "channel",
+    descriptionField: "jadwal",
   },
 
   {
@@ -582,6 +623,9 @@ export const TOOLS: ToolDef[] = [
     fields: [],
     resultKind: "json",
     renderKind: "resultList",
+    ...P("data"),
+    titleField: "soal",
+    descriptionField: "jawaban",
   },
 
   {
@@ -614,6 +658,9 @@ export const TOOLS: ToolDef[] = [
     fields: [],
     resultKind: "json",
     renderKind: "resultList",
+    ...P("data"),
+    titleField: "soal",
+    descriptionField: "jawaban",
   },
 
   {
@@ -624,6 +671,9 @@ export const TOOLS: ToolDef[] = [
     fields: [],
     resultKind: "json",
     renderKind: "resultList",
+    ...P("data"),
+    titleField: "soal",
+    descriptionField: "jawaban",
   },
 
   {
@@ -634,6 +684,9 @@ export const TOOLS: ToolDef[] = [
     fields: [],
     resultKind: "json",
     renderKind: "resultList",
+    ...P("data"),
+    titleField: "soal",
+    descriptionField: "jawaban",
   },
 
   {
@@ -644,8 +697,11 @@ export const TOOLS: ToolDef[] = [
     fields: [],
     resultKind: "json",
     renderKind: "quoteCard",
-    titleField: "quote",
     ...P("data"),
+    titleField: "quotes",
+    metaFields: ["karakter", "anime", "episode"],
+    imageField: "gambar",
+    linkField: "link",
   },
 
   {
@@ -656,6 +712,7 @@ export const TOOLS: ToolDef[] = [
     fields: [],
     resultKind: "json",
     renderKind: "mediaList",
+    ...P("data"),
   },
 
   {

@@ -38,8 +38,8 @@ app.get("/api/catalog", (c) =>
 
 app.get("/api/run/:id", (c) => proxyTool(c, "GET", c.req.query()))
 app.post("/api/run/:id", async (c) => {
-  const body = (await c.req.json().catch(() => ({}))) as { params?: Record<string, unknown> }
-  return proxyTool(c, "GET", body.params ?? {})
+  const body = (await c.req.json().catch(() => ({}))) as Record<string, unknown>
+  return proxyTool(c, "POST", body)
 })
 
 warmCache()

@@ -1,3 +1,21 @@
+/** key teknis yang gak perlu ditampilkan ke user */
+export const NOISE_KEYS = new Set(["status", "success", "creator", "timestamp", "ok"])
+
+/**
+ * Ambil payload utama dari respons.
+ * Tanpa path: turun otomatis ke `data` lalu `result` (bentuk umum API).
+ * Dengan path: pakai dotted path seperti biasa.
+ */
+export function resolvePayload(obj: unknown, path?: string): unknown {
+  if (path) return pickPath(obj, path)
+  if (obj && typeof obj === "object") {
+    const o = obj as Record<string, unknown>
+    if ("data" in o && o.data !== undefined) return o.data
+    if ("result" in o && o.result !== undefined) return o.result
+  }
+  return obj
+}
+
 /** ambil nested value pakai dotted path, mis. "data.item" */
 export function pickPath(obj: unknown, path?: string): unknown {
   if (!path) return obj

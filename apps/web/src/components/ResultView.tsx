@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { ArrowTopRightOnSquareIcon, ArrowDownTrayIcon, ClipboardDocumentIcon, UserCircleIcon, ClipboardIcon } from "@heroicons/react/24/outline"
 import { useToast } from "./Toast"
-import { pickArr, pickPath, pickStr, toUrl, humanLabel, formatValue } from "../lib/results"
+import { pickArr, pickPath, pickStr, toUrl, humanLabel, formatValue, resolvePayload, NOISE_KEYS } from "../lib/results"
 import type { ApiResponse, ToolDef } from "@neostudio/shared"
 
 export function ResultView({ tool, res }: { tool: ToolDef; res: ApiResponse }) {
@@ -43,33 +43,34 @@ function TextView({ text }: { text: string }) {
 
 function JsonView({ tool, data }: { tool: ToolDef; data: unknown }) {
   const kind = tool.renderKind ?? "codeBlock"
-  const items = pickArr<Record<string, unknown>>(pickPath(data, tool.resultPath))
+  const payload = resolvePayload(data, tool.resultPath)
+  const items = pickArr<Record<string, unknown>>(payload)
   switch (kind) {
     case "image":
-      return <ImageView tool={tool} imageUrl={String(pickPath(data, "data.imageUrl") || "")} />
+      return <ImageView tool={tool} imageUrl={String(pickPath(resolvePayload(data, tool.resultPath), "imageUrl") || "")} />
     case "keyValue":
-      return <KeyValueView obj={(items[0] ?? pickPath(data, tool.resultPath) ?? data) as Record<string, unknown>} titleField={tool.titleField} metaFields={tool.metaFields} />
+      return <KeyValueView obj={(items[0] ?? payload ?? data) as Record<string, unknown>} titleField={tool.titleField} metaFields={tool.metaFields} />
     case "articleList":
       return <ArticleList items={items} tool={tool} />
     case "mediaList":
-      return <MediaList items={items} tool={tool} rawData={data} />
+      return <MediaList items={items} tool={tool} rawData={payload} />
     case "resultList":
-      return <ResultList items={items} tool={tool} rawData={data} />
+      return <ResultList items={items} tool={tool} rawData={payload} />
     case "profileCard":
-      return <ProfileCardView obj={(items[0] ?? pickPath(data, tool.resultPath) ?? data) as Record<string, unknown>} tool={tool} />
+      return <ProfileCardView obj={(items[0] ?? payload ?? data) as Record<string, unknown>} tool={tool} />
     case "quoteCard":
-      return <QuoteCardView data={data} tool={tool} />
+      return <QuoteCardView data={payload} tool={tool} />
     case "downloadCard":
-      return <DownloadCard tool={tool} data={data} />
+      return <DownloadCard tool={tool} data={payload ?? data} />
     case "imagePair":
-      return <ImagePairView obj={(pickPath(data, tool.resultPath) ?? data) as Record<string, unknown>} tool={tool} />
+      return <ImagePairView obj={(payload ?? data) as Record<string, unknown>} tool={tool} />
     case "prayerTimes":
-      return <PrayerTimesView obj={(pickPath(data, tool.resultPath) ?? data) as Record<string, unknown>} tool={tool} />
+      return <PrayerTimesView obj={(payload ?? data) as Record<string, unknown>} tool={tool} />
     case "quiz":
-      return <QuizView obj={(pickPath(data, tool.resultPath) ?? data) as Record<string, unknown>} tool={tool} />
+      return <QuizView obj={(payload ?? data) as Record<string, unknown>} tool={tool} />
     case "codeBlock":
     default:
-      return <CodeBlock data={data} tool={tool} />
+      return <CodeBlock data={payload ?? data} tool={tool} />
   }
 }
 
@@ -180,14 +181,19 @@ function ProfileCardView({ obj, tool }: { obj: Record<string, unknown>; tool: To
 }
 
 function QuoteCardView({ data, tool }: { data: unknown; tool: ToolDef }) {
-  const items = pickArr<Record<string, unknown>>(pickPath(data, tool.resultPath ?? ""))
+  const items = pickArr<Record<string, unknown>>(data)
   const first = items[0] ?? (data as Record<string, unknown>)
-  const q = pickStr(first, tool.titleField ?? "quote") ?? pickStr(first, "result") ?? JSON.stringify(first).slice(0, 200)
-  const author = pickStr(first, "author") ?? pickStr(first, "by") ?? pickStr(first, "character")
+  const q = pickStr(first, tool.titleField ?? "quote") ?? pickStr(first, "quotes") ?? pickStr(first, "result") ?? JSON.stringify(first).slice(0, 200)
+  const author = pickStr(first, "author") ?? pickStr(first, "by") ?? pickStr(first, "character") ?? pickStr(first, "karakter")
+  const img = toUrl(pickStr(first, tool.imageField ?? "gambar") ?? pickStr(first, "image"))
   return (
-    <div className="nb-card p-6">
-      <p className="font-head text-xl sm:text-2xl leading-relaxed text-cream">“{q}”</p>
-      {author && <p className="mt-3 text-sm text-muted-fg">— {author}</p>}
+    <div className="nb-card p-6 flex gap-5 items-center">
+      {img && <img src={img} alt="" className="w-20 h-20 border border-line bg-altar object-cover shrink-0" loading="lazy" />}
+      <div className="min-w-0">
+        <p className="font-head text-xl sm:text-2xl leading-relaxed text-cream">“{q}”</p>
+        {author && <p className="mt-3 text-sm text-muted-fg">— {author}</p>}
+        <MetaChips obj={first} fields={tool.metaFields} />
+      </div>
     </div>
   )
 }
@@ -461,14 +467,59 @@ function QuizView({ obj, tool }: { obj: Record<string, unknown>; tool: ToolDef }
 
 function CodeBlock({ data, tool }: { data: unknown; tool?: ToolDef }) {
   const displayed = tool?.resultPath ? (pickPath(data, tool.resultPath) ?? data) : data
-  const text = typeof displayed === "string" ? displayed : JSON.stringify(displayed, null, 2)
+  return <JsonTree data={displayed} fallbackLabel="Hasil tidak terstruktur" />
+}
+
+/** render objekt apa aja jadi daftar key-value yang rapi (bukan JSON mentah) */
+function JsonTree({ data, fallbackLabel = "Hasil tidak terstruktur" }: { data: unknown; fallbackLabel?: string }) {
+  const rows: { k: string; v: string }[] = []
+  const walk = (node: unknown, prefix = ""): boolean => {
+    if (Array.isArray(node)) {
+      return node.some((it, i) => walk(it, prefix ? `${prefix}.${i + 1}` : `${i + 1}`))
+    }
+    if (node && typeof node === "object") {
+      let found = false
+      for (const [k, v] of Object.entries(node as Record<string, unknown>)) {
+        if (NOISE_KEYS.has(k)) continue
+        if (v && typeof v === "object") {
+          if (walk(v, prefix ? `${prefix}.${k}` : k)) found = true
+          continue
+        }
+        if (v === undefined || v === null) continue
+        rows.push({ k: prefix ? `${prefix}.${k}` : k, v: String(v) })
+        found = true
+      }
+      return found
+    }
+    if (node !== undefined && node !== null) {
+      rows.push({ k: prefix || "nilai", v: String(node) })
+      return true
+    }
+    return false
+  }
+  const found = walk(data)
+  if (!found || !rows.length) {
+    return (
+      <div className="nb-card p-5 flex flex-col gap-3">
+        <span className="text-sm text-muted-fg">{fallbackLabel}</span>
+        <CopyButton text={typeof data === "string" ? data : JSON.stringify(data, null, 2)} />
+      </div>
+    )
+  }
   return (
     <div className="nb-card p-5">
       <div className="flex items-center justify-between mb-3">
-        <span className="font-head text-sm">Respons</span>
-        <CopyButton text={text} />
+        <span className="font-head text-sm">Hasil</span>
+        <CopyButton text={JSON.stringify(data, null, 2)} />
       </div>
-      <pre className="text-xs overflow-auto max-h-96 font-mono break-words whitespace-pre-wrap">{text}</pre>
+      <dl className="grid grid-cols-1 sm:grid-cols-[10rem_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm">
+        {rows.map((r) => (
+          <div key={r.k} className="contents">
+            <dt className="text-muted-fg capitalize break-words">{humanLabel(r.k)}</dt>
+            <dd className="min-w-0 font-medium break-words">{formatValue(r.k, r.v)}</dd>
+          </div>
+        ))}
+      </dl>
     </div>
   )
 }

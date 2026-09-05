@@ -167,6 +167,8 @@ export async function proxyTool(c: Context, method: "GET" | "POST", params: Reco
   if (!up) return c.json({ ok: false, status: 500, error: "upstream config missing" }, 500)
 
   const full: ToolFull = { ...t, ...up }
+  // method upstream ditentukan config, bukan method HTTP dari web
+  const callMethod: "GET" | "POST" = up.method ?? "GET"
 
   const ip = getClientIp(c)
   if (!checkRate(ip)) {
@@ -174,8 +176,8 @@ export async function proxyTool(c: Context, method: "GET" | "POST", params: Reco
   }
 
   // cache only GET no-param
-  const cacheKey = `${method}:${t.id}:${JSON.stringify(params)}`
-  if (method === "GET" && Object.keys(params).length === 0) {
+  const cacheKey = `${callMethod}:${t.id}:${JSON.stringify(params)}`
+  if (callMethod === "GET" && Object.keys(params).length === 0) {
     const hit = cache.get(cacheKey)
     if (hit && Date.now() - hit.at < CACHE_TTL_MS) {
       const norm = normalize(full, hit.contentType, hit.body, hit.status)
@@ -184,8 +186,8 @@ export async function proxyTool(c: Context, method: "GET" | "POST", params: Reco
   }
 
   try {
-    const r = await callUpstream(full, method, params)
-    if (r.status >= 200 && r.status < 300 && method === "GET" && Object.keys(params).length === 0) {
+    const r = await callUpstream(full, callMethod, params)
+    if (r.status >= 200 && r.status < 300 && callMethod === "GET" && Object.keys(params).length === 0) {
       cache.set(cacheKey, { ...r, at: Date.now() })
     }
     return c.json(normalize(full, r.contentType, r.body, r.status))
