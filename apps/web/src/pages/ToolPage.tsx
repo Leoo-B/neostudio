@@ -1,22 +1,12 @@
 import { useEffect, useState } from "react"
 import { Link, useParams } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
-import { TOOLS, type ToolDef, type ApiResponse } from "@neostudio/shared"
+import { TOOLS, type ToolDef } from "@neostudio/shared"
 import { Header, Footer } from "./HomePage"
 import { useToast } from "../components/Toast"
 import { ResultView } from "../components/ResultView"
+import { runTool } from "../lib/run"
 import { ExclamationTriangleIcon, ArrowRightIcon, ClipboardIcon } from "@heroicons/react/24/outline"
-
-async function runTool(toolId: string, params: Record<string, unknown>): Promise<ApiResponse> {
-  const res = await fetch(`/api/run/${toolId}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ toolId, params }),
-  })
-  const json = (await res.json()) as ApiResponse
-  if (!json.ok) throw new Error(json.error ?? `Gagal (${json.status})`)
-  return json
-}
 
 export default function ToolPage() {
   const { id } = useParams({ strict: false }) as { id?: string }
@@ -111,7 +101,7 @@ export default function ToolPage() {
         )}
 
         <div className={`t-panel ${query.data ? "is-open" : ""}`}>
-          {query.data && <ResultView tool={tool} res={query.data} />}
+          {query.data && <ResultView tool={tool} res={query.data} params={params} />}
         </div>
       </main>
       <Footer />

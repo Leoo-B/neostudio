@@ -127,7 +127,8 @@ samp {
   }
 }
 
-.nb-error-shake {
+.nb-error-shake,
+.t-shake {
   animation: shake 350ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 @keyframes shake {

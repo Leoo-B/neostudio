@@ -24,6 +24,9 @@ export type ToolRenderKind =
   | "imagePair"
   | "prayerTimes"
   | "quiz"
+  | "tebakGambar"
+  | "family100"
+  | "mathQuiz"
 
 export interface ToolDef {
   id: string
@@ -56,6 +59,8 @@ export interface ToolDef {
   /** quiz: soal + jawaban yang bisa dibuka */
   questionField?: string
   answerField?: string
+  /** family100: field berisi array of accepted answers */
+  answersField?: string
   /** tool alternatif saat upstream gagal (mis. all-dl) */
   fallbackToolId?: string
   /** gunakan client-side (tanpa API) */

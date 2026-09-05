@@ -3,8 +3,11 @@ import { ArrowTopRightOnSquareIcon, ArrowDownTrayIcon, ClipboardDocumentIcon, Us
 import { useToast } from "./Toast"
 import { pickArr, pickPath, pickStr, toUrl, humanLabel, formatValue, resolvePayload, NOISE_KEYS } from "../lib/results"
 import type { ApiResponse, ToolDef } from "@neostudio/shared"
+import { TebakGambarGame } from "./games/TebakGambarGame"
+import { Family100Game } from "./games/Family100Game"
+import { MathQuizGame } from "./games/MathQuizGame"
 
-export function ResultView({ tool, res }: { tool: ToolDef; res: ApiResponse }) {
+export function ResultView({ tool, res, params }: { tool: ToolDef; res: ApiResponse; params?: Record<string, unknown> }) {
   return (
     <section aria-label="Hasil" className="mt-6">
       <div className="flex items-center gap-2 mb-3">
@@ -14,12 +17,26 @@ export function ResultView({ tool, res }: { tool: ToolDef; res: ApiResponse }) {
       {res.kind === "image" && res.imageUrl ? (
         <ImageView tool={tool} imageUrl={res.imageUrl} />
       ) : res.kind === "json" ? (
-        <JsonView tool={tool} data={res.data} />
+        <GameDispatch tool={tool} res={res} params={params} />
       ) : (
         <TextView text={String(res.data ?? "")} />
       )}
     </section>
   )
+}
+
+/** pilih antara game interaktif atau view statis berdasarkan renderKind */
+function GameDispatch({ tool, res, params }: { tool: ToolDef; res: ApiResponse; params?: Record<string, unknown> }) {
+  switch (tool.renderKind) {
+    case "tebakGambar":
+      return <TebakGambarGame tool={tool} res={res} params={params} />
+    case "family100":
+      return <Family100Game tool={tool} res={res} params={params} />
+    case "mathQuiz":
+      return <MathQuizGame tool={tool} res={res} params={params} />
+    default:
+      return <JsonView tool={tool} data={res.data} />
+  }
 }
 
 function ImageView({ tool, imageUrl }: { tool: ToolDef; imageUrl: string }) {

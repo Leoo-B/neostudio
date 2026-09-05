@@ -56,7 +56,7 @@ test("maths sudah pakai kyzznekoo dengan param level + renderKind quiz", () => {
   const m = TOOLS.find((t) => t.id === "maths")!
   assert.equal(UPSTREAM["maths"].source, "kyzznekoo")
   assert.equal(UPSTREAM["maths"].path, "/api/game/maths")
-  assert.equal(m.renderKind, "quiz")
+  assert.equal(m.renderKind, "mathQuiz")
   const level = m.fields.find((f) => f.name === "level")
   assert.ok(level && level.type === "select" && (level.options?.length ?? 0) > 0, "maths wajib punya param level select")
 })
