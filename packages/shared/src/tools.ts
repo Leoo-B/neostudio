@@ -639,7 +639,7 @@ export const TOOLS: ToolDef[] = [
         label: "Level",
         type: "select",
         required: true,
-        options: ["easy", "medium", "hard", "extreme", "impossible"],
+        options: ["easy", "medium", "hard", "expert", "insane", "legend"],
       },
     ],
     resultKind: "json",
