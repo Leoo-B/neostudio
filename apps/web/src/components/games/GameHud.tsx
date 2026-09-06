@@ -40,5 +40,6 @@ export function useCountdown(running: boolean, onEnd?: () => void) {
     setMax(n)
     setDetik(n)
   }
-  return { detik, max, reset }
+  const kurangi = (n: number) => setDetik((d) => Math.max(0, d - n))
+  return { detik, max, reset, kurangi }
 }

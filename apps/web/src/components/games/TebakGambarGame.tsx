@@ -16,53 +16,60 @@ const norm = (s: string) =>
     .replace(/\s+/g, " ")
     .replace(/[^\w\s]/g, "")
 
+type Soal = { index: number; jawaban: string; img?: string; deskripsi?: string }
+
 export function TebakGambarGame({ tool, res, params }: { tool: ToolDef; res: ApiResponse; params?: Record<string, unknown> }) {
-  const payload = resolvePayload(res.data, tool.resultPath) as Record<string, unknown>
+  const toSoal = (data: unknown): Soal => {
+    const p = (resolvePayload(data, tool.resultPath) ?? {}) as Record<string, unknown>
+    return {
+      index: Number(p["index"] ?? Math.random() * 1e9),
+      jawaban: pickStr(p, tool.answerField ?? "jawaban") ?? "",
+      img: toUrl(pickStr(p, tool.imageField ?? "img")),
+      deskripsi: pickStr(p, tool.descriptionField ?? "deskripsi"),
+    }
+  }
+
   const [skor, setSkor] = useState(0)
-  const [soal, setSoal] = useState<Record<string, unknown> | null>(payload ?? null)
+  const [soal, setSoal] = useState<Soal>(() => toSoal(res.data))
   const [tebakan, setTebakan] = useState("")
+  const [diJawab, setDiJawab] = useState(false)
   const [feedback, setFeedback] = useState<null | { benar: boolean; text: string }>(null)
   const [selesai, setSelesai] = useState(false)
   const [mengambil, setMengambil] = useState(false)
+  const [gagal, setGagal] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const confetti = useGameConfetti()
   const { detik, reset } = useCountdown(!selesai, () => setSelesai(true))
 
   useEffect(() => {
     reset(GAME_SECONDS)
-  }, [])
-
-  const jawaban = pickStr(soal, tool.answerField ?? "jawaban") ?? ""
-  const img = toUrl(pickStr(soal, tool.imageField ?? "img"))
-  const deskripsi = pickStr(soal, tool.descriptionField ?? "deskripsi")
+  }, [reset])
 
   const ambilSoal = useCallback(async () => {
     setMengambil(true)
-    setFeedback(null)
+    setGagal(false)
     try {
       const r = await runTool(tool.id, params ?? {})
-      setSoal(resolvePayload(r.data, tool.resultPath) as Record<string, unknown>)
+      setSoal(toSoal(r.data))
+      setDiJawab(false)
+      setTebakan("")
+      setFeedback(null)
     } catch {
-      setFeedback({ benar: false, text: "Gagal ambil soal baru — coba klik Lewati." })
+      setGagal(true)
+      setFeedback({ benar: false, text: "Gagal ambil soal baru — klik Lewati lagi." })
     } finally {
       setMengambil(false)
     }
   }, [tool.id, tool.resultPath, params])
 
-  const nextSoal = useCallback(() => {
-    setTebakan("")
-    setFeedback(null)
-    void ambilSoal()
-  }, [ambilSoal])
-
   const cek = () => {
-    if (!tebakan.trim() || !jawaban || feedback?.benar) return
-    if (norm(tebakan) === norm(jawaban)) {
-      const poin = POIN_BENAR
-      setSkor((s) => s + poin)
-      setFeedback({ benar: true, text: `Benar! +${poin} poin` })
+    if (!tebakan.trim() || !soal.jawaban || diJawab) return
+    if (norm(tebakan) === norm(soal.jawaban)) {
+      setSkor((s) => s + POIN_BENAR)
+      setDiJawab(true)
+      setFeedback({ benar: true, text: `Benar! +${POIN_BENAR} poin` })
       confetti()
-      window.setTimeout(() => nextSoal(), 2000)
+      window.setTimeout(() => void ambilSoal(), 2000)
     } else {
       setFeedback({ benar: false, text: "Belum tepat, coba lagi!" })
       inputRef.current?.select()
@@ -72,8 +79,10 @@ export function TebakGambarGame({ tool, res, params }: { tool: ToolDef; res: Api
   const mainLagi = () => {
     setSkor(0)
     setSelesai(false)
+    setDiJawab(false)
     setTebakan("")
     setFeedback(null)
+    setGagal(false)
     reset(GAME_SECONDS)
     void ambilSoal()
   }
@@ -92,17 +101,31 @@ export function TebakGambarGame({ tool, res, params }: { tool: ToolDef; res: Api
     )
   }
 
+  const inputMati = diJawab || mengambil || selesai
+
   return (
     <div className="nb-card p-5 sm:p-6">
       <GameHud skor={skor} detik={detik} maxDetik={GAME_SECONDS} label="poin" />
-      <div className="border border-line rounded-xl overflow-hidden bg-black aspect-video grid place-items-center mb-4" aria-label="Gambar tebakan">
-        {img ? (
-          <img src={img} alt="Gambar clue — tebak jawabannya" className="w-full h-full object-contain" />
-        ) : (
-          <div className="nb-skeleton w-full h-full" />
-        )}
+      <div className="border border-line rounded-xl overflow-hidden bg-black grid place-items-center mb-4" aria-label="Gambar tebakan">
+        <div className="relative w-full">
+          {mengambil ? (
+            <div className="aspect-video grid place-items-center">
+              <span className="inline-block w-8 h-8 border-2 border-line border-t-cream rounded-full animate-spin" aria-label="Memuat soal baru" />
+            </div>
+          ) : soal.img ? (
+            <img
+              src={soal.img}
+              alt="Gambar clue — tebak jawabannya"
+              className="w-full h-auto max-h-[60vh] object-contain"
+            />
+          ) : (
+            <div className="nb-skeleton aspect-video w-full" />
+          )}
+        </div>
       </div>
-      {deskripsi && <p className="text-sm text-muted-fg text-center mb-4">Clue: {deskripsi}</p>}
+      {soal.deskripsi && !mengambil && (
+        <p className="text-sm text-muted-fg text-center mb-4">Clue: {soal.deskripsi}</p>
+      )}
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -113,18 +136,28 @@ export function TebakGambarGame({ tool, res, params }: { tool: ToolDef; res: Api
         <input
           ref={inputRef}
           className="nb-input flex-1 min-h-[44px]"
-          placeholder="Tulis tebakanmu…"
+          placeholder={diJawab ? "Tepat! Soal berikutnya…" : "Tulis tebakanmu…"}
           value={tebakan}
           onChange={(e) => setTebakan(e.target.value)}
-          disabled={feedback?.benar || mengambil}
+          disabled={inputMati}
           aria-label="Tebakan"
           autoComplete="off"
         />
-        <button type="submit" className="nb-btn min-h-[44px] disabled:opacity-50" disabled={feedback?.benar || mengambil || !tebakan.trim()}>
+        <button type="submit" className="nb-btn min-h-[44px] disabled:opacity-50" disabled={inputMati || !tebakan.trim()}>
           Tebak!
         </button>
-        <button type="button" className="nb-btn min-h-[44px] inline-flex items-center gap-2" onClick={nextSoal} disabled={mengambil}>
-          <ArrowPathIcon className="w-4 h-4" aria-hidden /> Lewati
+        <button
+          type="button"
+          className="nb-btn min-h-[44px] inline-flex items-center justify-center gap-2 disabled:opacity-40"
+          onClick={() => void ambilSoal()}
+          disabled={mengambil}
+        >
+          {mengambil ? (
+            <span className="inline-block w-4 h-4 border-2 border-line border-t-cream rounded-full animate-spin" aria-hidden />
+          ) : (
+            <ArrowPathIcon className="w-4 h-4" aria-hidden />
+          )}
+          {mengambil ? "Memuat…" : "Lewati"}
         </button>
       </form>
       <div className="min-h-[28px] mt-3" aria-live="polite">
@@ -132,6 +165,7 @@ export function TebakGambarGame({ tool, res, params }: { tool: ToolDef; res: Api
           <p className={`flex items-center gap-1.5 text-sm font-medium ${feedback.benar ? "text-cream" : "text-danger"}`}>
             {feedback.benar ? <CheckCircleIcon className="w-4 h-4" aria-hidden /> : <XCircleIcon className="w-4 h-4" aria-hidden />}
             {feedback.text}
+            {gagal && <span className="text-muted-fg text-xs">(soal tidak berubah)</span>}
           </p>
         )}
       </div>

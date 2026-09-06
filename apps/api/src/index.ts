@@ -3,7 +3,7 @@ import { cors } from "hono/cors"
 import { logger } from "hono/logger"
 import dns from "node:dns"
 import { TOOLS } from "@neostudio/shared"
-import { proxyTool, warmCache } from "./proxy"
+import { proxyTool } from "./proxy"
 
 // Environment ini tanpa rute IPv6 ke upstream — paksa resolve IPv4 dulu
 // agar fetch bawaan (Happy Eyeballs) tidak gagal ENETUNREACH.
@@ -42,8 +42,6 @@ app.post("/api/run/:id", async (c) => {
   const params = (body.params as Record<string, unknown> | undefined) ?? body
   return proxyTool(c, "POST", params)
 })
-
-warmCache()
 
 const port = Number(process.env.PORT ?? 8787)
 console.log(`[neostudio api] listening on http://localhost:${port}`)

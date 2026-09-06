@@ -110,7 +110,7 @@ describe("proxyTool — normalisasi", () => {
     expect(r.body.kind).toBe("json")
   })
 
-  it("cache dipakai untuk no-param tool bila hit < TTL", async () => {
+  it("tanpa cache: panggilan berulang selalu tembus ke upstream", async () => {
     let calls = 0
     _setFetchForTest(async () => {
       calls++
@@ -120,12 +120,13 @@ describe("proxyTool — normalisasi", () => {
       }) as never
     })
     const c1 = fakeCtx("berita-cnn", {})
-    await proxyTool(c1, "GET", {})
+    const r1 = (await proxyTool(c1, "GET", {})) as any
     expect(calls).toBe(1)
+    expect(r1.body.cached).toBeUndefined()
     const c2 = fakeCtx("berita-cnn", {})
     const r2 = (await proxyTool(c2, "GET", {})) as any
-    expect(r2.body.cached).toBe(true)
-    expect(calls).toBe(1) // tidak memanggil upstream lagi
+    expect(calls).toBe(2) // selalu panggil upstream lagi (no cache)
+    expect(r2.body.kind).toBe("json")
   })
 
   it("rate limit 429 bila melewati 60/menit", async () => {

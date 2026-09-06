@@ -8,6 +8,7 @@ import { LightBulbIcon, ArrowPathIcon, CheckCircleIcon, XCircleIcon } from "@her
 
 const POIN_BENAR = 10
 const BIAYA_CLUE = 5
+const PENALTI_LEWATI = 3
 
 /** buka digit pertama jawaban, sisanya underscore. "-482" -> "-4__" */
 function bukaDigitPertama(ans: string): string {
@@ -36,7 +37,7 @@ export function MathQuizGame({ tool, res, params }: { tool: ToolDef; res: ApiRes
 
   const { detik, reset } = useCountdown(!selesai && !!question, () => setSelesai(true))
 
-  const ambilSoal = useCallback(async () => {
+  const ambilSoal = useCallback(async (penalti = 0) => {
     setMengambil(true)
     setFeedback(null)
     setClue(null)
@@ -46,15 +47,20 @@ export function MathQuizGame({ tool, res, params }: { tool: ToolDef; res: ApiRes
       const p = resolvePayload(r.data, tool.resultPath) as Record<string, unknown>
       setSoal(p)
       const t = Number(pickStr(p, "time") ?? 0)
-      reset(t > 0 ? Math.round(t / 1000) : detikAwal)
+      const baru = Math.max(1, (t > 0 ? Math.round(t / 1000) : detikAwal) - penalti)
+      reset(baru)
+      if (penalti > 0) setFeedback({ benar: true, text: `Lewati: waktu −${penalti} detik` })
     } catch {
       setFeedback({ benar: false, text: "Gagal ambil soal — klik Lewati." })
     } finally {
       setMengambil(false)
     }
-  }, [tool.id, tool.resultPath, params])
+  }, [tool.id, tool.resultPath, params, detikAwal, reset])
 
-  const nextSoal = () => void ambilSoal()
+  const nextSoal = () => {
+    // penalti lewati: waktu soal berikutnya −3 detik (reset di ambilSoal)
+    void ambilSoal(PENALTI_LEWATI)
+  }
 
   const cek = () => {
     if (!tebakan.trim() || !answer || feedback?.benar) return
@@ -136,7 +142,7 @@ export function MathQuizGame({ tool, res, params }: { tool: ToolDef; res: ApiRes
           title={skor < BIAYA_CLUE ? "Poin kurang dari 5" : undefined}
           className="nb-btn min-h-[44px] inline-flex items-center justify-center gap-2 disabled:opacity-40"
         >
-          <LightBulbIcon className="w-4 h-4" aria-hidden /> Clue (−{BIAYA_CLUE})
+          <LightBulbIcon className="w-4 h-4" aria-hidden /> Clue (−{BIAYA_CLUE} poin)
         </button>
         <button type="button" onClick={nextSoal} disabled={mengambil} className="nb-btn min-h-[44px] inline-flex items-center justify-center gap-2">
           <ArrowPathIcon className="w-4 h-4" aria-hidden /> Lewati

@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from "react"
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react"
 import { CheckCircleIcon } from "@heroicons/react/24/solid"
 
 type Toast = { id: number; msg: string }
@@ -24,15 +24,27 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 flex flex-col gap-2 pointer-events-none">
         {toasts.map((t) => (
-          <div
-            key={t.id}
-            className="t-toast is-open nb-card pointer-events-auto bg-bg border border-line px-5 py-3 flex items-center gap-2 text-sm font-medium"
-          >
-            <CheckCircleIcon className="w-5 h-5 text-cream shrink-0" />
-            <span>{t.msg}</span>
-          </div>
+          <ToastItem key={t.id} msg={t.msg} />
         ))}
       </div>
     </Ctx.Provider>
+  )
+}
+
+function ToastItem({ msg }: { msg: string }) {
+  const [open, setOpen] = useState(false)
+  useEffect(() => {
+    const r = requestAnimationFrame(() => setOpen(true))
+    return () => cancelAnimationFrame(r)
+  }, [])
+  return (
+    <div
+      className={`t-toast ${open ? "is-open" : ""} nb-card pointer-events-auto bg-bg border border-line px-5 py-3 flex items-center gap-2 text-sm font-medium`}
+      role="status"
+      aria-live="polite"
+    >
+      <CheckCircleIcon className="w-5 h-5 text-cream shrink-0" />
+      <span>{msg}</span>
+    </div>
   )
 }

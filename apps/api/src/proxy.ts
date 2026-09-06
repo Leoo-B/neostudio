@@ -7,11 +7,9 @@ type ToolFull = ToolDef & ToolUpstream
 const TOOL_TIMEOUT_MS = 25_000
 const RATE_LIMIT_WINDOW_MS = 60_000
 const RATE_LIMIT_MAX = 60 // max request per menit per IP
-const CACHE_TTL_MS = 60_000 // 1 menit cache untuk endpoint tanpa parameter dinamis
 
 // in-memory ip bucket
 const buckets = new Map<string, { count: number; resetAt: number }>()
-const cache = new Map<string, { at: number; body: ArrayBuffer; contentType: string; status: number }>()
 
 // injectable untuk testing
 let _fetch: typeof fetch = fetch
@@ -24,7 +22,6 @@ export function _setNowForTest(n: () => number) {
 }
 export function _resetForTest() {
   buckets.clear()
-  cache.clear()
   _fetch = fetch
   _now = () => Date.now()
 }
@@ -54,22 +51,6 @@ export function buildQuery(params: Record<string, unknown>): string {
   }
   const s = usp.toString()
   return s ? `?${s}` : ""
-}
-
-export function warmCache() {
-  // pre-cache endpoint tanpa parameter (berita, info, games primbon select, dsb)
-  for (const t of TOOLS) {
-    const up = UPSTREAM[t.id]
-    if (!up || t.fields.length > 0 || up.method === "POST") continue
-    const cacheKey = `GET:${t.id}:`
-    if (!cache.has(cacheKey)) {
-      void callUpstream({ ...t, ...up }, "GET", {})
-        .then((r) => {
-          if (r) cache.set(cacheKey, { ...r, at: Date.now() })
-        })
-        .catch(() => {})
-    }
-  }
 }
 
 async function callUpstream(t: ToolFull, method: "GET" | "POST", params: Record<string, unknown>) {
@@ -175,21 +156,8 @@ export async function proxyTool(c: Context, method: "GET" | "POST", params: Reco
     return c.json({ ok: false, status: 429, error: "rate limit — coba lagi nanti" }, 429)
   }
 
-  // cache only GET no-param
-  const cacheKey = `${callMethod}:${t.id}:${JSON.stringify(params)}`
-  if (callMethod === "GET" && Object.keys(params).length === 0) {
-    const hit = cache.get(cacheKey)
-    if (hit && Date.now() - hit.at < CACHE_TTL_MS) {
-      const norm = normalize(full, hit.contentType, hit.body, hit.status)
-      return c.json({ ...norm, cached: true })
-    }
-  }
-
   try {
     const r = await callUpstream(full, callMethod, params)
-    if (r.status >= 200 && r.status < 300 && callMethod === "GET" && Object.keys(params).length === 0) {
-      cache.set(cacheKey, { ...r, at: Date.now() })
-    }
     return c.json(normalize(full, r.contentType, r.body, r.status))
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e)

@@ -71,8 +71,15 @@ export default function ToolPage() {
             <p className="text-muted-fg text-sm mb-4">Tool ini tidak butuh input — langsung jalankan.</p>
           )}
           <button onClick={run} disabled={!hasRequired || query.isLoading}
-            className="nb-btn mt-4 w-full sm:w-auto">
-            {query.isLoading ? "Menjalankan…" : "Jalankan"}
+            className="nb-btn mt-4 w-full sm:w-auto relative overflow-hidden disabled:opacity-70">
+            <span className={query.isLoading ? "invisible" : ""}>Jalankan</span>
+            {query.isLoading && (
+              <span className="absolute inset-0 flex items-center justify-center gap-2" aria-live="polite">
+                <span className="inline-block w-4 h-4 border-2 border-bg/30 border-t-cream rounded-full animate-spin" aria-hidden />
+                <span>Menjalankan…</span>
+              </span>
+            )}
+            {query.isLoading && <span className="absolute left-0 right-0 bottom-0 t-progress-indeterminate" aria-hidden />}
           </button>
         </div>
 
@@ -94,9 +101,12 @@ export default function ToolPage() {
         )}
 
         {query.isLoading && !query.data && (
-          <div className="space-y-3">
-            <div className="nb-skeleton h-40 w-full" />
-            <div className="nb-skeleton h-4 w-2/3" />
+          <div className="nb-card overflow-hidden" aria-live="polite" aria-busy="true">
+            <div className="t-progress-indeterminate" aria-hidden />
+            <div className="p-5 sm:p-6 text-sm text-muted-fg flex items-center gap-3">
+              <span className="inline-block w-4 h-4 border-2 border-line border-t-cream rounded-full animate-spin" aria-hidden />
+              Mengambil hasil…
+            </div>
           </div>
         )}
 
