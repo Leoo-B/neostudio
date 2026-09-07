@@ -1,21 +1,21 @@
 import { Hono } from "hono"
 import { cors } from "hono/cors"
 import { logger } from "hono/logger"
-import dns from "node:dns"
 import { TOOLS } from "@neostudio/shared"
 import { proxyTool } from "./proxy"
 
-// Environment ini tanpa rute IPv6 ke upstream — paksa resolve IPv4 dulu
-// agar fetch bawaan (Happy Eyeballs) tidak gagal ENETUNREACH.
-dns.setDefaultResultOrder("ipv4first")
-
 const app = new Hono()
+
+const allow = (process.env.ALLOWED_ORIGINS ?? "*")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean)
 
 app.use("*", logger())
 app.use(
   "*",
   cors({
-    origin: (origin) => origin ?? "*",
+    origin: allow.includes("*") ? "*" : allow,
     credentials: false,
   })
 )
@@ -43,10 +43,4 @@ app.post("/api/run/:id", async (c) => {
   return proxyTool(c, "POST", params)
 })
 
-const port = Number(process.env.PORT ?? 8787)
-console.log(`[neostudio api] listening on http://localhost:${port}`)
-
-// @ts-ignore — Hono node-server handles serve.
-import { serve } from "@hono/node-server"
-
-serve({ fetch: app.fetch, port })
+export default app

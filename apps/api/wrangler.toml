@@ -1,0 +1,10 @@
+name = "neostudio-api"
+main = "src/index.ts"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ALLOWED_ORIGINS = "https://neostudio.web.id,https://www.neostudio.web.id"
+
+[observability]
+enabled = true
