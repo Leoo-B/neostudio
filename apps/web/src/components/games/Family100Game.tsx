@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react"
 import type { ApiResponse, ToolDef } from "@neostudio/shared"
+import { runTool } from "../../lib/run"
 import { pickStr, resolvePayload } from "../../lib/results"
 import { GameHud } from "./GameHud"
 import { useGameConfetti } from "./useGameConfetti"
@@ -25,16 +26,18 @@ const norm = (s: string) => s.toLowerCase().trim().replace(/\s+/g, " ")
 
 type Found = { jawaban: string; poin: number }
 
-export function Family100Game({ tool, res }: { tool: ToolDef; res: ApiResponse; params?: Record<string, unknown> }) {
-  const payload = resolvePayload(res.data, tool.resultPath) as Record<string, unknown>
-  const soal = pickStr(payload, tool.questionField ?? "soal") ?? ""
-  const jawaban = (pickArrStr(payload, tool.answersField ?? "jawaban") ?? []).filter(Boolean)
+export function Family100Game({ tool, res, params }: { tool: ToolDef; res: ApiResponse; params?: Record<string, unknown> }) {
+  const initial = resolvePayload(res.data, tool.resultPath) as Record<string, unknown>
+  const [soal, setSoal] = useState(() => pickStr(initial, tool.questionField ?? "soal") ?? "")
+  const [jawaban, setJawaban] = useState<string[]>(() =>
+    (pickArrStr(initial, tool.answersField ?? "jawaban") ?? []).filter(Boolean)
+  )
   const poin = poinPerSlot(jawaban.length)
-
   const [input, setInput] = useState("")
   const [found, setFound] = useState<Found[]>([])
   const [skor, setSkor] = useState(0)
   const [checking, setChecking] = useState(false)
+  const [mengambil, setMengambil] = useState(false)
   const [feedback, setFeedback] = useState<null | { ok: boolean; text: string }>(null)
   const [shake, setShake] = useState(false)
   const [done, setDone] = useState(false)
@@ -47,18 +50,31 @@ export function Family100Game({ tool, res }: { tool: ToolDef; res: ApiResponse; 
     inputRef.current?.focus()
   }, [])
 
-  const resetRound = useCallback(() => {
+  const ambilSoal = useCallback(async () => {
+    setMengambil(true)
     setFound([])
     setSkor(0)
     setInput("")
     setFeedback(null)
     setDone(false)
-  }, [])
+    try {
+      const r = await runTool(tool.id, params ?? {})
+      const p = resolvePayload(r.data, tool.resultPath) as Record<string, unknown>
+      setSoal(pickStr(p, tool.questionField ?? "soal") ?? "")
+      setJawaban((pickArrStr(p, tool.answersField ?? "jawaban") ?? []).filter(Boolean))
+    } catch {
+      setFeedback({ ok: false, text: "Gagal ambil soal — klik Main Lagi." })
+    } finally {
+      setMengambil(false)
+    }
+  }, [tool.id, tool.resultPath, params])
+
+  const mainLagi = () => void ambilSoal()
 
   const submit = (e?: FormEvent) => {
     e?.preventDefault()
     const val = input.trim()
-    if (!val || checking || done) return
+    if (!val || checking || done || mengambil) return
     setChecking(true)
     setFeedback(null)
     setInput("")
@@ -98,7 +114,18 @@ export function Family100Game({ tool, res }: { tool: ToolDef; res: ApiResponse; 
         <p className="font-head text-2xl">Semua jawaban ditemukan!</p>
         <p className="text-muted-fg">Skor</p>
         <p className="font-head text-5xl text-cream tabular-nums">{skor}</p>
-        <button onClick={resetRound} className="nb-btn mt-2 inline-flex items-center gap-2 min-h-[44px]">
+        <button onClick={mainLagi} className="nb-btn mt-2 inline-flex items-center gap-2 min-h-[44px]" disabled={mengambil}>
+          <ArrowPathIcon className="w-4 h-4" aria-hidden /> Main Lagi
+        </button>
+      </div>
+    )
+  }
+
+  if (!jawaban.length && !mengambil && !done) {
+    return (
+      <div className="nb-card p-8 text-center flex flex-col items-center gap-4" aria-live="polite">
+        <p className="font-head text-xl">Gagal mengambil soal</p>
+        <button onClick={mainLagi} className="nb-btn mt-2 inline-flex items-center gap-2 min-h-[44px]" disabled={mengambil}>
           <ArrowPathIcon className="w-4 h-4" aria-hidden /> Main Lagi
         </button>
       </div>
@@ -120,11 +147,11 @@ export function Family100Game({ tool, res }: { tool: ToolDef; res: ApiResponse; 
           placeholder={checking ? "Mengecek…" : "Ketik jawaban…"}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          disabled={checking}
+          disabled={checking || mengambil}
           aria-label="Jawaban"
           autoComplete="off"
         />
-        <button type="submit" className="nb-btn min-h-[44px] disabled:opacity-50 inline-flex items-center justify-center gap-2" disabled={!input.trim() || checking}>
+        <button type="submit" className="nb-btn min-h-[44px] disabled:opacity-50 inline-flex items-center justify-center gap-2" disabled={!input.trim() || checking || mengambil}>
           {checking && <span className="inline-block w-4 h-4 border-2 border-line border-t-cream rounded-full animate-spin" aria-hidden />}
           {checking ? "Cek…" : "Submit"}
         </button>

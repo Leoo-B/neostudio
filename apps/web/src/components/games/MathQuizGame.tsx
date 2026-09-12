@@ -35,7 +35,7 @@ export function MathQuizGame({ tool, res, params }: { tool: ToolDef; res: ApiRes
   const timeMs = Number(pickStr(soal, "time") ?? 0)
   const detikAwal = timeMs > 0 ? Math.round(timeMs / 1000) : 20
 
-  const { detik, reset } = useCountdown(!selesai && !!question, () => setSelesai(true))
+  const { detik, reset } = useCountdown(!selesai && !!question, () => setSelesai(true), detikAwal)
 
   const ambilSoal = useCallback(async (penalti = 0) => {
     setMengambil(true)

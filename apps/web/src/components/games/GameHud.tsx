@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { FireIcon, ClockIcon } from "@heroicons/react/24/solid"
 
 export function GameHud({ skor, detik, maxDetik, label }: { skor: number; detik?: number; maxDetik?: number; label?: string }) {
@@ -25,9 +25,9 @@ export function GameHud({ skor, detik, maxDetik, label }: { skor: number; detik?
 }
 
 /** timer countdown sederhana; panggil reset(n) buat mulai ulang */
-export function useCountdown(running: boolean, onEnd?: () => void) {
-  const [detik, setDetik] = useState(0)
-  const [max, setMax] = useState(0)
+export function useCountdown(running: boolean, onEnd?: () => void, initialSeconds = 0) {
+  const [detik, setDetik] = useState(initialSeconds)
+  const [max, setMax] = useState(initialSeconds)
   useEffect(() => {
     if (!running || detik <= 0) return
     const t = setInterval(() => setDetik((d) => Math.max(0, d - 1)), 1000)
@@ -36,10 +36,10 @@ export function useCountdown(running: boolean, onEnd?: () => void) {
   useEffect(() => {
     if (running && detik === 0 && max > 0) onEnd?.()
   }, [detik, running])
-  const reset = (n: number) => {
+  const reset = useCallback((n: number) => {
     setMax(n)
     setDetik(n)
-  }
-  const kurangi = (n: number) => setDetik((d) => Math.max(0, d - n))
+  }, [])
+  const kurangi = useCallback((n: number) => setDetik((d) => Math.max(0, d - n)), [])
   return { detik, max, reset, kurangi }
 }
