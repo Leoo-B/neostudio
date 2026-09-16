@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link, useParams } from "@tanstack/react-router"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { TOOLS, type ToolDef } from "@neostudio/shared"
 import { Header, Footer } from "./HomePage"
 import { useToast } from "../components/Toast"
@@ -20,6 +20,15 @@ export default function ToolPage() {
     queryFn: () => runTool(tool!.id, params),
     enabled: !!tool && submitted,
   })
+
+  const queryClient = useQueryClient()
+
+  // keluar tool = hapus hasil cache-nya, biar balik lagi mulai dari awal
+  useEffect(() => {
+    return () => {
+      queryClient.removeQueries({ queryKey: ["run", tool?.id] })
+    }
+  }, [tool?.id, queryClient])
 
   useEffect(() => {
     if (query.isSuccess) toast(`${tool?.id ?? "Tool"} berhasil dijalankan`)
