@@ -1,150 +1,121 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useState } from "react"
 import { Link } from "@tanstack/react-router"
-import { MagnifyingGlassIcon, ChevronRightIcon } from "@heroicons/react/24/outline"
+import { ChevronRightIcon } from "@heroicons/react/24/outline"
 import { CATEGORIES, TOOLS } from "@neostudio/shared"
 import { ToolCard, CATEGORY_ICONS } from "../components/ToolCard"
 import { FAQ } from "../components/FAQ"
 import { Reveal } from "../components/Reveal"
 import { AnimatedCounter } from "../components/AnimatedCounter"
-
-function useScrollProgress(): number {
-  const [p, setP] = useState(0)
-  useEffect(() => {
-    let raf = 0
-    const onScroll = () => {
-      cancelAnimationFrame(raf)
-      raf = requestAnimationFrame(() => {
-        const total = document.documentElement.scrollHeight - window.innerHeight
-        setP(total > 0 ? (window.scrollY / total) * 100 : 0)
-      })
-    }
-    onScroll()
-    window.addEventListener("scroll", onScroll, { passive: true })
-    window.addEventListener("resize", onScroll)
-    return () => {
-      cancelAnimationFrame(raf)
-      window.removeEventListener("scroll", onScroll)
-      window.removeEventListener("resize", onScroll)
-    }
-  }, [])
-  return p
-}
+import { Header, Footer } from "../components/Layout"
 
 export default function HomePage() {
-  const [q, setQ] = useState("")
   const [selectedTab, setSelectedTab] = useState<string>("tools")
-  const searchInputRef = useRef<HTMLInputElement>(null)
-
-  const filtered = useMemo(() => {
-    const t = q.trim().toLowerCase()
-    if (!t) return []
-    return TOOLS.filter((x) => x.name.toLowerCase().includes(t) || x.desc.toLowerCase().includes(t)).slice(0, 8)
-  }, [q])
-
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "/" && !e.metaKey && !e.ctrlKey && !e.altKey) {
-      const tag = (e.target as HTMLElement)?.tagName
-      if (tag !== "INPUT" && tag !== "TEXTAREA" && tag !== "SELECT") {
-        e.preventDefault()
-        searchInputRef.current?.focus()
-      }
-    }
-  }
-
-  const progress = useScrollProgress()
   const activeCat = CATEGORIES.find((c) => c.id === selectedTab) ?? CATEGORIES[0]
   const toolsInTab = TOOLS.filter((t) => t.category === selectedTab).slice(0, 3)
 
   return (
-    <div className="min-h-dvh bg-bg" onKeyDown={onKeyDown}>
-      <div className="t-progress-wrap" role="progressbar" aria-label="Kemajuan scroll" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100}>
-        <div className="t-progress-bar" style={{ width: `${Math.min(progress, 100)}%` }} />
-      </div>
+    <div className="min-h-dvh bg-bg">
       <Header />
       <main className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
-        {/* Hero */}
-        <section className="pt-16 pb-10 text-center">
-          <div className="inline-block nb-card px-4 py-1.5 mb-6 rounded-full">
-            <span className="text-[11px] font-mono uppercase tracking-widest text-cream">gratis · tanpa daftar · tanpa iklan</span>
-          </div>
-          <h1 className="font-head text-4xl sm:text-6xl leading-tight">
-            neostudio<span className="text-cream">.</span>
-          </h1>
-          <p className="mt-4 text-muted-fg text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Satu tempat untuk 64+ alat digital — unduh video, generate QR, cek berita, edit gambar, sampai primbon.
-            Semua gratis, tanpa daftar, tanpa iklan pop-up.
-          </p>
-          <div className="mt-8 flex items-center justify-center gap-6 sm:gap-10 text-cream">
-            <div className="text-center">
-              <div className="font-head text-4xl sm:text-5xl leading-none">
-                <AnimatedCounter to={64} />
-              </div>
-              <div className="mt-1 text-[11px] font-mono uppercase tracking-widest text-muted-fg">tools</div>
+        {/* Hero — split kiri/kanan */}
+        <section className="pt-12 sm:pt-20 pb-12 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+          <div>
+            <div className="inline-block nb-pill px-4 py-1.5 mb-6">
+              <span className="text-[11px] font-mono uppercase tracking-widest text-cream">gratis · tanpa daftar · tanpa iklan</span>
             </div>
-            <div className="h-10 w-px bg-line" aria-hidden />
-            <div className="text-center">
-              <div className="font-head text-4xl sm:text-5xl leading-none">
-                <AnimatedCounter to={8} />
+            <h1 className="font-head text-4xl sm:text-6xl leading-[1.05] tracking-tight">
+              Semua alat digital
+              <br />
+              dalam <span className="text-cream">satu tempat.</span>
+            </h1>
+            <p className="mt-5 text-muted-fg text-base sm:text-lg max-w-xl leading-relaxed">
+              Unduh video, generate QR, cek berita, edit gambar, sampai primbon. {TOOLS.length}+ alat gratis, tanpa daftar, tanpa iklan pop-up.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link to="/tools" className="nb-btn inline-flex items-center gap-2 min-h-[44px] px-6">
+                Jelajahi Semua Tools <ChevronRightIcon className="w-4 h-4" aria-hidden />
+              </Link>
+              <Link to="/tools" search={{ cat: "games" }} className="nb-btn-alt inline-flex items-center gap-2 min-h-[44px] px-6">
+                Main Game
+              </Link>
+            </div>
+            <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4 sm:gap-x-8">
+              <div>
+                <div className="font-head text-3xl sm:text-4xl leading-none text-cream">
+                  <AnimatedCounter to={TOOLS.length} />
+                </div>
+                <div className="mt-1.5 text-[10px] font-mono uppercase tracking-widest text-muted-fg">tools</div>
               </div>
-              <div className="mt-1 text-[11px] font-mono uppercase tracking-widest text-muted-fg">kategori</div>
+              <div className="h-10 w-px bg-line" aria-hidden />
+              <div>
+                <div className="font-head text-3xl sm:text-4xl leading-none text-cream">
+                  <AnimatedCounter to={CATEGORIES.length} />
+                </div>
+                <div className="mt-1.5 text-[10px] font-mono uppercase tracking-widest text-muted-fg">kategori</div>
+              </div>
+              <div className="h-10 w-px bg-line" aria-hidden />
+              <div>
+                <div className="font-head text-3xl sm:text-4xl leading-none text-cream">100%</div>
+                <div className="mt-1.5 text-[10px] font-mono uppercase tracking-widest text-muted-fg">gratis</div>
+              </div>
             </div>
           </div>
-          <div className="mt-8 max-w-xl mx-auto relative">
-            <MagnifyingGlassIcon className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-muted-fg pointer-events-none" />
-            <input
-              ref={searchInputRef}
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Cari tool… tekan / untuk fokus (mis. tiktok, qr, zodiak)"
-              className="nb-input pl-12"
-              aria-label="Cari tool"
-            />
-            {filtered.length > 0 && (
-              <div className="absolute z-20 mt-2 w-full nb-card p-2 max-h-72 overflow-auto text-left shadow-lift">
-                {filtered.map((t) => (
-                  <Link key={t.id} to="/tool/$id" params={{ id: t.id }} search={{ cat: t.category }} className="flex items-center justify-between px-3 py-2 text-sm hover:bg-muted hover:text-cream transition-colors duration-150 rounded-lg">
-                    <span>{t.name}</span>
-                    <ChevronRightIcon className="w-4 h-4 text-muted-fg" />
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-          <div className="mt-8 flex justify-center">
-            <Link to="/tools" className="nb-btn inline-flex items-center gap-2">
-              Jelajahi Semua Tools
-              <ChevronRightIcon className="w-4 h-4" />
-            </Link>
+
+          {/* Bento mockup kanan — tile kategori clickable */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {CATEGORIES.map((c, i) => {
+              const Icon = CATEGORY_ICONS[c.icon] ?? CATEGORY_ICONS.WrenchScrewdriverIcon
+              const count = TOOLS.filter((t) => t.category === c.id).length
+              const wide = i === 0
+              return (
+                <Link
+                  key={c.id}
+                  to="/tools"
+                  search={{ cat: c.id }}
+                  className={`nb-card nb-lift p-4 flex flex-col items-start gap-2.5 cursor-pointer ${wide ? "sm:col-span-2" : ""}`}
+                >
+                  <div className="shrink-0 w-9 h-9 grid place-items-center rounded-lg border border-line bg-altar">
+                    <Icon className="w-4 h-4 text-cream" aria-hidden />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm leading-tight">{c.name}</p>
+                    <p className="text-[11px] text-muted-fg mt-0.5 font-mono">{count} tools</p>
+                  </div>
+                </Link>
+              )
+            })}
           </div>
         </section>
 
-        {/* Kategori — tab filter */}
+        {/* Bento kategori — tabs + 3 tool preview */}
         <Reveal>
-          <section aria-label="Pilih kategori" className="py-6">
-            <div className="flex flex-wrap gap-3 justify-center mb-6">
+          <section aria-label="Pilih kategori" className="py-10 border-t border-line">
+            <div className="flex items-end justify-between mb-6 flex-wrap gap-4">
+              <div>
+                <h2 className="font-head text-2xl sm:text-3xl">Jelajahi kategori</h2>
+                <p className="text-sm text-muted-fg mt-1">{activeCat.desc}</p>
+              </div>
+              <Link to="/tools" search={{ cat: selectedTab }} className="text-sm text-cream hover:underline inline-flex items-center gap-1">
+                Lihat semua <ChevronRightIcon className="w-4 h-4" />
+              </Link>
+            </div>
+            <div role="group" aria-label="Pilih kategori" className="flex flex-wrap gap-2 mb-6">
               {CATEGORIES.map((c) => {
                 const Icon = CATEGORY_ICONS[c.icon] ?? CATEGORY_ICONS.WrenchScrewdriverIcon
+                const active = selectedTab === c.id
                 return (
                   <button
                     key={c.id}
                     type="button"
                     onClick={() => setSelectedTab(c.id)}
-                    className={`nb-chip ${selectedTab === c.id ? "is-active" : ""}`}
+                    aria-pressed={active}
+                    className={`nb-chip ${active ? "is-active" : ""}`}
                   >
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-4 h-4" aria-hidden />
                     {c.name}
                   </button>
                 )
               })}
-            </div>
-            <div className="flex items-end justify-between mb-5">
-              <div>
-                <h2 className="font-head text-2xl">{activeCat.name}</h2>
-                <p className="text-sm text-muted-fg mt-1">{activeCat.tagline}</p>
-              </div>
-              <Link to="/tools" search={{ cat: selectedTab }} className="text-sm text-cream hover:underline inline-flex items-center gap-1">
-                Lihat semua <ChevronRightIcon className="w-4 h-4" />
-              </Link>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {toolsInTab.map((t) => (
@@ -156,7 +127,7 @@ export default function HomePage() {
 
         {/* FAQ */}
         <Reveal>
-          <section aria-label="Pertanyaan umum" className="py-10 max-w-3xl mx-auto">
+          <section aria-label="Pertanyaan umum" className="py-10 max-w-3xl mx-auto border-t border-line">
             <h2 className="font-head text-2xl sm:text-3xl text-center mb-8">Pertanyaan Umum</h2>
             <FAQ
               groups={[
@@ -209,44 +180,5 @@ export default function HomePage() {
       </main>
       <Footer />
     </div>
-  )
-}
-
-export function Header() {
-  return (
-    <header className="sticky top-0 z-30 bg-bg/85 backdrop-blur border-b border-line">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        <Link to="/" className="font-head text-xl font-bold tracking-tight hover:text-cream transition-colors duration-150">
-          neo<span className="text-cream">studio</span>
-        </Link>
-        <nav className="flex items-center gap-5 text-sm">
-          <Link to="/" className="hover:text-cream transition-colors duration-150 hidden sm:inline">Home</Link>
-          <Link to="/tools" className="hover:text-cream transition-colors duration-150">Tools</Link>
-          <a
-            href="https://github.com/Leoo-B/neostudio"
-            target="_blank"
-            rel="noreferrer"
-            className="text-muted-fg hover:text-cream transition-colors duration-150"
-          >
-            GitHub
-          </a>
-        </nav>
-      </div>
-    </header>
-  )
-}
-
-export function Footer() {
-  return (
-    <footer className="border-t border-line mt-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-fg">
-        <p>© {new Date().getFullYear()} neostudio — dibangun dengan React + Hono.</p>
-        <nav className="flex items-center gap-5">
-          <Link to="/" className="hover:text-cream transition-colors duration-150">Home</Link>
-          <Link to="/tools" className="hover:text-cream transition-colors duration-150">Tools</Link>
-          <a href="https://github.com/Leoo-B/neostudio" target="_blank" rel="noreferrer" className="hover:text-cream transition-colors duration-150">GitHub</a>
-        </nav>
-      </div>
-    </footer>
   )
 }

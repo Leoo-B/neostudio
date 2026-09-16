@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from "react"
 import { Link, useSearch, useRouter } from "@tanstack/react-router"
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline"
 import { CATEGORIES, TOOLS } from "@neostudio/shared"
-import { Header, Footer } from "./HomePage"
+import { Header, Footer } from "../components/Layout"
 import { ToolCard, CATEGORY_ICONS } from "../components/ToolCard"
 import { Reveal } from "../components/Reveal"
 

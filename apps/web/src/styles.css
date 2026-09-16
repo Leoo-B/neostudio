@@ -4,6 +4,30 @@
 @tailwind components;
 @tailwind utilities;
 
+/* shadcn css vars — dipetakan ke token neostudio biar sinkron */
+:root {
+  --background: 240 10% 5%;      /* #0B0B0F */
+  --foreground: 40 30% 96%;      /* #F7F5F2 */
+  --card: 240 10% 9%;            /* #15151C */
+  --card-foreground: 40 30% 96%;
+  --popover: 240 10% 9%;
+  --popover-foreground: 40 30% 96%;
+  --primary: 39 62% 83%;         /* #F5DEB3 cream */
+  --primary-foreground: 240 10% 5%;
+  --secondary: 240 5% 16%;       /* #2A2A33 */
+  --secondary-foreground: 40 30% 96%;
+  --muted: 240 5% 16%;
+  --muted-foreground: 240 4% 65%; /* #A9A9B3 */
+  --accent: 240 5% 16%;
+  --accent-foreground: 40 30% 96%;
+  --destructive: 2 83% 71%;      /* #F8716F */
+  --destructive-foreground: 40 30% 96%;
+  --border: 240 10% 96% / 10%;   /* line token */
+  --input: 240 10% 96% / 10%;
+  --ring: 39 62% 83%;
+  --radius: 0.75rem;
+}
+
 html,
 body,
 #root {
@@ -45,6 +69,12 @@ samp {
   border-color: rgba(245,222,179,0.25);
   box-shadow: 0 12px 32px rgba(0,0,0,0.45);
 }
+.nb-pill {
+  background: #15151c;
+  border: 1px solid rgba(247,245,242,0.10);
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
 
 .nb-btn {
   background: #f5deb3;
@@ -70,6 +100,20 @@ samp {
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+.nb-btn-alt {
+  background: #15151c;
+  color: #f7f5f2;
+  border: 1px solid rgba(247,245,242,0.10);
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), border-color 200ms, background 200ms;
+}
+.nb-btn-alt:hover {
+  border-color: rgba(247,245,242,0.18);
+  background: #1b1b23;
 }
 
 .nb-input {

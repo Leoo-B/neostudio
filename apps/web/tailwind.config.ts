@@ -14,6 +14,16 @@ export default {
         line: "rgba(247,245,242,0.10)",
         "line-strong": "rgba(247,245,242,0.18)",
         danger: "#F8716F",
+        // shadcn semantic colors (map ke CSS vars di styles.css)
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        popover: { DEFAULT: "hsl(var(--popover))", foreground: "hsl(var(--popover-foreground))" },
+        primary: { DEFAULT: "hsl(var(--primary))", foreground: "hsl(var(--primary-foreground))" },
+        secondary: { DEFAULT: "hsl(var(--secondary))", foreground: "hsl(var(--secondary-foreground))" },
+        accent: { DEFAULT: "hsl(var(--accent))", foreground: "hsl(var(--accent-foreground))" },
+        destructive: { DEFAULT: "hsl(var(--destructive))", foreground: "hsl(var(--destructive-foreground))" },
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
       },
       fontFamily: {
         head: ["Space Grotesk", "sans-serif"],
