@@ -104,7 +104,7 @@ export default function ToolsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {results.map((t) => {
               const c = CATEGORIES.find((x) => x.id === t.category)
-              return <ToolCard key={t.id} tool={t} icon={c ? CATEGORY_ICONS[c.icon] : undefined} />
+              return <ToolCard key={t.id} tool={t} icon={c ? CATEGORY_ICONS[c.icon] : undefined} cat={cat} />
             })}
           </div>
         )}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Link, useParams } from "@tanstack/react-router"
+import { Link, useSearch, useParams } from "@tanstack/react-router"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { TOOLS, type ToolDef } from "@neostudio/shared"
 import { Header, Footer } from "./HomePage"
@@ -10,6 +10,7 @@ import { ExclamationTriangleIcon, ArrowRightIcon, ClipboardIcon } from "@heroico
 
 export default function ToolPage() {
   const { id } = useParams({ strict: false }) as { id?: string }
+  const { cat } = useSearch({ strict: false }) as { cat?: string }
   const tool = TOOLS.find((t) => t.id === id)
   const [params, setParams] = useState<Record<string, string>>({})
   const [submitted, setSubmitted] = useState(false)
@@ -58,7 +59,7 @@ export default function ToolPage() {
     <div className="min-h-dvh bg-bg">
       <Header />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
-        <Link to="/tools" className="inline-flex items-center gap-1 text-sm text-muted-fg hover:text-cream transition-colors duration-150 mb-6">
+        <Link to="/tools" search={cat ? { cat } : undefined} className="inline-flex items-center gap-1 text-sm text-muted-fg hover:text-cream transition-colors duration-150 mb-6">
           ← Kembali ke daftar tools
         </Link>
 

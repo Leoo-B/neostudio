@@ -102,7 +102,7 @@ export default function HomePage() {
             {filtered.length > 0 && (
               <div className="absolute z-20 mt-2 w-full nb-card p-2 max-h-72 overflow-auto text-left shadow-lift">
                 {filtered.map((t) => (
-                  <Link key={t.id} to="/tool/$id" params={{ id: t.id }} className="flex items-center justify-between px-3 py-2 text-sm hover:bg-muted hover:text-cream transition-colors duration-150 rounded-lg">
+                  <Link key={t.id} to="/tool/$id" params={{ id: t.id }} search={{ cat: t.category }} className="flex items-center justify-between px-3 py-2 text-sm hover:bg-muted hover:text-cream transition-colors duration-150 rounded-lg">
                     <span>{t.name}</span>
                     <ChevronRightIcon className="w-4 h-4 text-muted-fg" />
                   </Link>
@@ -148,7 +148,7 @@ export default function HomePage() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {toolsInTab.map((t) => (
-                <ToolCard key={t.id} tool={t} icon={CATEGORY_ICONS[activeCat.icon] ?? CATEGORY_ICONS.WrenchScrewdriverIcon} />
+                <ToolCard key={t.id} tool={t} icon={CATEGORY_ICONS[activeCat.icon] ?? CATEGORY_ICONS.WrenchScrewdriverIcon} cat={selectedTab} />
               ))}
             </div>
           </section>

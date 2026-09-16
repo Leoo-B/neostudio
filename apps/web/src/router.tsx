@@ -33,6 +33,9 @@ export const toolsRoute = createRoute({
 export const toolRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/tool/$id",
+  validateSearch: (search: Record<string, unknown>): { cat?: string } => ({
+    cat: typeof search.cat === "string" ? search.cat : undefined,
+  }),
   component: ToolPage,
 })
 

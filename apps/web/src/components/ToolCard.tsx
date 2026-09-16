@@ -13,12 +13,13 @@ export const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: st
   EyeIcon,
 }
 
-export function ToolCard({ tool, icon }: { tool: ToolDef; icon?: React.ComponentType<{ className?: string }> }) {
+export function ToolCard({ tool, icon, cat }: { tool: ToolDef; icon?: React.ComponentType<{ className?: string }>; cat?: string }) {
   const Icon = icon ?? WrenchScrewdriverIcon
   return (
     <Link
       to="/tool/$id"
       params={{ id: tool.id }}
+      search={cat ? { cat } : undefined}
       className="nb-card nb-lift p-4 flex items-start gap-3 cursor-pointer"
     >
       <div className="shrink-0 w-10 h-10 grid place-items-center rounded-xl border border-line bg-altar">
