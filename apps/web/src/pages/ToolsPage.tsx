@@ -15,7 +15,7 @@ export default function ToolsPage() {
   const cat = rawCat === "all" || CATEGORIES.some((c) => c.id === rawCat) ? rawCat : "all"
 
   const setCat = (id: string) => {
-    router.navigate({ to: "/tools", search: { cat: id } })
+    router.navigate({ to: "/tools", search: { cat: id }, replace: true })
   }
 
   const results = useMemo(() => {

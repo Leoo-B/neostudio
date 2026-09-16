@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Link, useSearch, useParams } from "@tanstack/react-router"
+import { Link, useSearch, useParams, useRouter } from "@tanstack/react-router"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { TOOLS, type ToolDef } from "@neostudio/shared"
 import { Header, Footer } from "./HomePage"
@@ -11,7 +11,17 @@ import { ExclamationTriangleIcon, ArrowRightIcon, ClipboardIcon } from "@heroico
 export default function ToolPage() {
   const { id } = useParams({ strict: false }) as { id?: string }
   const { cat } = useSearch({ strict: false }) as { cat?: string }
+  const router = useRouter()
   const tool = TOOLS.find((t) => t.id === id)
+
+  // kembali beneran kalau dari dalam app (gak numpuk history); fallback navigasi kalau deep-link
+  const kembali = () => {
+    if (document.referrer.startsWith(window.location.origin)) {
+      router.history.back()
+    } else {
+      router.navigate({ to: "/tools", search: cat ? { cat } : undefined })
+    }
+  }
   const [params, setParams] = useState<Record<string, string>>({})
   const [submitted, setSubmitted] = useState(false)
   const toast = useToast()
@@ -59,9 +69,9 @@ export default function ToolPage() {
     <div className="min-h-dvh bg-bg">
       <Header />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
-        <Link to="/tools" search={cat ? { cat } : undefined} className="inline-flex items-center gap-1 text-sm text-muted-fg hover:text-cream transition-colors duration-150 mb-6">
+        <button type="button" onClick={kembali} className="inline-flex items-center gap-1 text-sm text-muted-fg hover:text-cream transition-colors duration-150 mb-6">
           ← Kembali ke daftar tools
-        </Link>
+        </button>
 
         <h1 className="font-head text-3xl sm:text-4xl mb-1">{tool.name}</h1>
         <p className="text-muted-fg mb-6">{tool.desc}</p>
