@@ -7,6 +7,7 @@ import { FAQ } from "../components/FAQ"
 import { Reveal } from "../components/Reveal"
 import { AnimatedCounter } from "../components/AnimatedCounter"
 import { Header, Footer } from "../components/Layout"
+import Bento02 from "../components/ui/bento-02"
 
 export default function HomePage() {
   const [selectedTab, setSelectedTab] = useState<string>("tools")
@@ -86,6 +87,11 @@ export default function HomePage() {
             })}
           </div>
         </section>
+
+        {/* Bento — kenapa neostudio */}
+        <Reveal>
+          <Bento02 />
+        </Reveal>
 
         {/* Bento kategori — tabs + 3 tool preview */}
         <Reveal>
