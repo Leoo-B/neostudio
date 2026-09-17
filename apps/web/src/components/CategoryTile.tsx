@@ -83,35 +83,40 @@ export function CategoryTile({ c, open, onToggle }: Props) {
         <p className="text-[11px] text-muted-fg mt-0.5 font-mono">{count} tools</p>
       </div>
 
-      {/* overlay preview — absolute, zero layout shift; z-30 di root saat open supaya gak tertimpa sibling */}
-      {open ? (
-        <div
-          className="absolute left-0 right-0 top-full z-30 mt-1 nb-card bg-card shadow-lift p-2 rounded-lg"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <p className="text-[10px] font-mono uppercase tracking-widest text-cream px-2 py-1">
-            {c.tagline}
-          </p>
-          {tools.map((t) => (
-            <Link
-              key={t.id}
-              to="/tool/$id"
-              params={{ id: t.id }}
-              search={{ cat: c.id }}
-              className="block px-2 py-1.5 text-xs text-fg/80 hover:text-cream hover:bg-altar rounded truncate transition-colors duration-100"
-            >
-              {t.name}
-            </Link>
-          ))}
+      {/* overlay preview — selalu mounted, animate opacity/scale; zero layout shift; z-30 di root saat open */}
+      <div
+        className={`absolute left-0 right-0 top-full z-30 mt-1 nb-card bg-card shadow-lift p-2 rounded-lg origin-top transition-all duration-200 ease-smooth ${
+          open
+            ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
+            : "opacity-0 scale-[0.97] -translate-y-1 pointer-events-none"
+        }`}
+        aria-hidden={!open}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <p className="text-[10px] font-mono uppercase tracking-widest text-cream px-2 py-1">
+          {c.tagline}
+        </p>
+        {tools.map((t) => (
           <Link
-            to="/tools"
+            key={t.id}
+            to="/tool/$id"
+            params={{ id: t.id }}
             search={{ cat: c.id }}
-            className="block px-2 py-1.5 text-[11px] text-muted-fg hover:text-cream transition-colors duration-100"
+            tabIndex={open ? undefined : -1}
+            className="block px-2 py-1.5 text-xs text-fg/80 hover:text-cream hover:bg-altar rounded truncate transition-colors duration-100"
           >
-            Lihat semua {count} tools →
+            {t.name}
           </Link>
-        </div>
-      ) : null}
+        ))}
+        <Link
+          to="/tools"
+          search={{ cat: c.id }}
+          tabIndex={open ? undefined : -1}
+          className="block px-2 py-1.5 text-[11px] text-muted-fg hover:text-cream transition-colors duration-100"
+        >
+          Lihat semua {count} tools →
+        </Link>
+      </div>
     </div>
   )
 }

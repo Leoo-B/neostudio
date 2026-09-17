@@ -3,7 +3,7 @@ import {
   IconMapPin,
   IconClock,
   IconTimezone,
-  IconGlobe,
+  IconWorld,
   IconBattery1,
   IconBattery3,
   IconBattery4,
@@ -86,18 +86,33 @@ export function DeviceStrip() {
 
   // baterai (deprecated API — graceful fallback wajib)
   useEffect(() => {
-    type BatteryLike = { level: number; charging?: boolean; addEventListener?: (t: string, l: () => void) => void }
+    type BatteryLike = { level: number; charging?: boolean; addEventListener?: (t: string, l: () => void) => void; removeEventListener?: (t: string, l: () => void) => void }
     const nav = navigator as Navigator & { getBattery?: () => Promise<BatteryLike> }
     if (!nav.getBattery) return
+    let battery: BatteryLike | null = null
+    let update: (() => void) | null = null
+    let pollId: ReturnType<typeof setInterval> | null = null
+
     nav
       .getBattery()
       .then((b) => {
-        const update = () => setBat({ level: b.level, charging: b.charging })
+        battery = b
+        update = () => setBat({ level: b.level, charging: b.charging })
         update()
         b.addEventListener?.("levelchange", update)
         b.addEventListener?.("chargingchange", update)
+        // backup: polling setiap 10s (sebagian browser gak fire event real-time)
+        pollId = setInterval(() => update?.(), 10_000)
       })
       .catch(() => {})
+
+    return () => {
+      if (update && battery) {
+        battery.removeEventListener?.("levelchange", update)
+        battery.removeEventListener?.("chargingchange", update)
+      }
+      if (pollId) clearInterval(pollId)
+    }
   }, [])
 
   // jam per detik sesuai timezone IP
@@ -175,7 +190,7 @@ export function DeviceStrip() {
         <div className="flex items-center gap-2 sm:gap-3 sm:ml-auto">
           {info?.ip ? (
             <span className="inline-flex items-center gap-1.5 text-fg/80">
-              <IconGlobe stroke={STROKE} className="w-3.5 h-3.5 text-muted-fg shrink-0" aria-hidden />
+              <IconWorld stroke={STROKE} className="w-3.5 h-3.5 text-muted-fg shrink-0" aria-hidden />
               {info.ip}
             </span>
           ) : null}
