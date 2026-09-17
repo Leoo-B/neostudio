@@ -492,7 +492,9 @@ samp {
 /* overlay kategori: transition butuh specificity tinggi — .nb-card di file ini
    menang dari transition-all Tailwind karena layer order (sama kayak nb-pill dulu) */
 .nb-overlay-anim {
-  transition: opacity 200ms cubic-bezier(0.22, 1, 0.36, 1), transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    opacity 300ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ─── scroll progress bar (atas halaman) ─── */

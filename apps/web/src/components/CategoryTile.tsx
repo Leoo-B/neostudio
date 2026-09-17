@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Link } from "@tanstack/react-router"
 import { ChevronDownIcon } from "@heroicons/react/24/outline"
 import { TOOLS, type CategoryDef } from "@neostudio/shared"
@@ -15,6 +15,13 @@ export function CategoryTile({ c, open, onToggle }: Props) {
   const tools = TOOLS.filter((t) => t.category === c.id).slice(0, 3)
   const count = TOOLS.filter((t) => t.category === c.id).length
   const ref = useRef<HTMLDivElement>(null)
+  // pinned: user sudah klik → overlay stay open biar link bisa diklik
+  const [pinned, setPinned] = useState(false)
+
+  // reset pinned kalau overlay ditutup dari luar (escape/outside-click/hover)
+  useEffect(() => {
+    if (!open) setPinned(false)
+  }, [open])
 
   // Escape → tutup
   useEffect(() => {
@@ -44,14 +51,24 @@ export function CategoryTile({ c, open, onToggle }: Props) {
       className={`nb-card nb-lift relative p-4 flex flex-col items-start gap-2.5 cursor-pointer ${open ? "z-30" : ""}`}
       onPointerEnter={(e) => {
         // touch device: skip hover-open, biar click-toggle yang kerja
-        if (e.pointerType === "touch" || isTouch) return
+        if (e.pointerType === "touch" || isTouch || pinned) return
         onToggle(c.id)
       }}
       onPointerLeave={(e) => {
-        if (e.pointerType === "touch" || isTouch) return
+        if (e.pointerType === "touch" || isTouch || pinned) return
         onToggle(null)
       }}
-      onClick={() => onToggle(open ? null : c.id)}
+      onClick={() => {
+        // klik pertama: pin (overlay stay, link bisa diklik). klik lagi: tutup.
+        if (open && pinned) {
+          onToggle(null)
+        } else if (!open) {
+          onToggle(c.id)
+          setPinned(true)
+        } else {
+          setPinned(true)
+        }
+      }}
       onBlur={(e) => {
         // focus pindah ke luar tile → tutup; kalau pindah ke Link di dalam overlay, tetap open
         if (!e.currentTarget.contains(e.relatedTarget as Node)) onToggle(null)
@@ -88,10 +105,12 @@ export function CategoryTile({ c, open, onToggle }: Props) {
         className={`absolute left-0 right-0 top-full z-30 mt-1 nb-card nb-overlay-anim bg-card shadow-lift p-2 rounded-lg origin-top ${
           open
             ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
-            : "opacity-0 scale-[0.97] -translate-y-1 pointer-events-none"
+            : "opacity-0 scale-95 -translate-y-2.5 pointer-events-none"
         }`}
         aria-hidden={!open}
         onClick={(e) => e.stopPropagation()}
+        onPointerEnter={(e) => e.stopPropagation()}
+        onPointerLeave={(e) => e.stopPropagation()}
       >
         <p className="text-[10px] font-mono uppercase tracking-widest text-cream px-2 py-1">
           {c.tagline}
