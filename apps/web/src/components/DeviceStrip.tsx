@@ -60,6 +60,10 @@ function Skeleton() {
   return <span className="nb-skeleton inline-block w-24 h-3 rounded-sm" aria-hidden />
 }
 
+function Sep() {
+  return <span className="text-line sm:hidden" aria-hidden>|</span>
+}
+
 export function DeviceStrip() {
   const [info, setInfo] = useState<WhereAmI | null>(null)
   const [now, setNow] = useState<Date | null>(null)
@@ -148,16 +152,22 @@ export function DeviceStrip() {
             <Skeleton />
           )}
           {zona ? (
-            <span className="inline-flex sm:pl-3 sm:border-l sm:border-line items-center gap-1.5 text-cream">
-              <IconTimezone stroke={STROKE} className="w-3.5 h-3.5 shrink-0" aria-hidden />
-              {zona}
-            </span>
+            <>
+              <Sep />
+              <span className="inline-flex sm:pl-3 sm:border-l sm:border-line items-center gap-1.5 text-cream">
+                <IconTimezone stroke={STROKE} className="w-3.5 h-3.5 shrink-0" aria-hidden />
+                {zona}
+              </span>
+            </>
           ) : null}
           {jam ? (
-            <span className="inline-flex items-center gap-1.5 sm:pl-3 sm:border-l sm:border-line tabular-nums text-fg/80">
-              <IconClock stroke={STROKE} className="w-3.5 h-3.5 text-muted-fg shrink-0" aria-hidden />
-              {jam}
-            </span>
+            <>
+              <Sep />
+              <span className="inline-flex items-center gap-1.5 sm:pl-3 sm:border-l sm:border-line tabular-nums text-fg/80">
+                <IconClock stroke={STROKE} className="w-3.5 h-3.5 text-muted-fg shrink-0" aria-hidden />
+                {jam}
+              </span>
+            </>
           ) : null}
         </div>
 
@@ -170,7 +180,9 @@ export function DeviceStrip() {
             </span>
           ) : null}
           {batState ? (
-            <span className={`inline-flex items-center gap-1.5 sm:pl-3 sm:border-l sm:border-line ${batState.tone}`}>
+            <>
+              <Sep />
+              <span className={`inline-flex items-center gap-1.5 sm:pl-3 sm:border-l sm:border-line ${batState.tone}`}>
               {batState.charging ? (
                 <IconBatteryCharging2 stroke={STROKE} className="w-4 h-4 shrink-0" aria-hidden />
               ) : (
@@ -178,6 +190,7 @@ export function DeviceStrip() {
               )}
               {batState.label}
             </span>
+            </>
           ) : bat ? (
             // level null (battery API tanpa value)
             <span className="inline-flex items-center gap-1.5 text-muted-fg sm:pl-3 sm:border-l sm:border-line">
