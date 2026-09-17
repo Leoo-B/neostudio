@@ -22,6 +22,32 @@ app.use(
 
 app.get("/health", (c) => c.json({ ok: true, ts: Date.now() }))
 
+app.get("/api/whereami", (c) => {
+  // cf object dari Cloudflare (gratis, zero upstream call)
+  const raw = c.req.raw as Request & { cf?: Record<string, unknown> }
+  const cf = raw.cf ?? {}
+  const ip =
+    (c.req.header("cf-connecting-ip") ?? "").trim() ||
+    (c.req.header("x-forwarded-for") ?? "").split(",")[0].trim() ||
+    (c.req.header("x-real-ip") ?? "").trim() ||
+    null
+
+  const tz = typeof cf.timezone === "string" ? cf.timezone : null
+  const city = typeof cf.city === "string" ? cf.city : null
+  const country = typeof cf.country === "string" ? cf.country : null
+  const region = typeof cf.region === "string" ? cf.region : null
+
+  return c.json({
+    ok: Boolean(ip || city),
+    ip,
+    city,
+    region,
+    country,
+    timezone: tz,
+    hint: !ip && !city ? "info lokasi tidak tersedia" : undefined,
+  })
+})
+
 app.get("/api/catalog", (c) =>
   c.json({
     tools: TOOLS.map((t) => ({

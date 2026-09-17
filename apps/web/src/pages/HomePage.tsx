@@ -1,25 +1,22 @@
-import { useState } from "react"
 import { Link } from "@tanstack/react-router"
 import { ChevronRightIcon, BoltIcon, ShieldCheckIcon } from "@heroicons/react/24/outline"
 import { CATEGORIES, TOOLS } from "@neostudio/shared"
-import { ToolCard, CATEGORY_ICONS } from "../components/ToolCard"
+import { CategoryTile } from "../components/CategoryTile"
 import { FAQ } from "../components/FAQ"
 import { Reveal } from "../components/Reveal"
 import { AnimatedCounter } from "../components/AnimatedCounter"
 import { Header, Footer } from "../components/Layout"
 import { SectionHeader } from "../components/SectionHeader"
+import { DeviceStrip } from "../components/DeviceStrip"
 
 export default function HomePage() {
-  const [selectedTab, setSelectedTab] = useState<string>("tools")
-  const activeCat = CATEGORIES.find((c) => c.id === selectedTab) ?? CATEGORIES[0]
-  const toolsInTab = TOOLS.filter((t) => t.category === selectedTab).slice(0, 3)
-
   return (
     <div className="min-h-dvh bg-bg">
       <Header />
+      <DeviceStrip />
       <main className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
         {/* Hero — split kiri/kanan */}
-        <section className="pt-24 sm:pt-32 pb-16 sm:pb-20 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <section className="pt-12 sm:pt-16 pb-16 sm:pb-20 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div>
             <div className="inline-block nb-pill px-4 py-1.5 mb-6">
               <span className="text-[11px] font-mono uppercase tracking-widest text-cream">gratis · tanpa daftar · tanpa iklan</span>
@@ -82,7 +79,7 @@ export default function HomePage() {
                   Mulai cepat
                 </span>
                 <p className="font-head text-lg sm:text-xl tracking-tight mt-1.5">
-                  Buka di browser, langsung pakai
+                  Coba sekarang
                 </p>
                 <span className="inline-flex items-center gap-1 text-xs text-muted-fg mt-2 group-hover:text-cream">
                   Lihat semua tools
@@ -91,27 +88,10 @@ export default function HomePage() {
               </div>
             </Link>
 
-            {/* 8 kategori tile */}
-            {CATEGORIES.map((c) => {
-              const Icon = CATEGORY_ICONS[c.icon] ?? CATEGORY_ICONS.WrenchScrewdriverIcon
-              const count = TOOLS.filter((t) => t.category === c.id).length
-              return (
-                <Link
-                  key={c.id}
-                  to="/tools"
-                  search={{ cat: c.id }}
-                  className="nb-card nb-lift p-4 flex flex-col items-start gap-2.5 cursor-pointer"
-                >
-                  <div className="shrink-0 w-9 h-9 grid place-items-center rounded-lg border border-line bg-altar">
-                    <Icon className="w-4 h-4 text-cream" aria-hidden />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-medium text-sm leading-tight">{c.name}</p>
-                    <p className="text-[11px] text-muted-fg mt-0.5 font-mono">{count} tools</p>
-                  </div>
-                </Link>
-              )
-            })}
+            {/* 8 kategori tile — hover/tap expand */}
+            {CATEGORIES.map((c) => (
+              <CategoryTile key={c.id} c={c} />
+            ))}
 
             {/* 2 feature tile (non-clickable, tanpa lift) */}
             {[
@@ -130,45 +110,6 @@ export default function HomePage() {
             ))}
           </div>
         </section>
-
-        {/* Bento kategori — tabs + 3 tool preview */}
-        <Reveal>
-          <section aria-label="Pilih kategori" className="py-16 sm:py-24">
-            <div className="flex items-end justify-between mb-6 flex-wrap gap-4">
-              <SectionHeader
-                eyebrow="Kategori"
-                title="Jelajahi kategori"
-                desc={activeCat.desc}
-              />
-              <Link to="/tools" search={{ cat: selectedTab }} className="text-sm text-cream hover:underline inline-flex items-center gap-1">
-                Lihat semua <ChevronRightIcon className="w-4 h-4" />
-              </Link>
-            </div>
-            <div role="group" aria-label="Pilih kategori" className="flex flex-wrap gap-2 mb-6">
-              {CATEGORIES.map((c) => {
-                const Icon = CATEGORY_ICONS[c.icon] ?? CATEGORY_ICONS.WrenchScrewdriverIcon
-                const active = selectedTab === c.id
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => setSelectedTab(c.id)}
-                    aria-pressed={active}
-                    className={`nb-chip ${active ? "is-active" : ""}`}
-                  >
-                    <Icon className="w-4 h-4" aria-hidden />
-                    {c.name}
-                  </button>
-                )
-              })}
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {toolsInTab.map((t) => (
-                <ToolCard key={t.id} tool={t} icon={CATEGORY_ICONS[activeCat.icon] ?? CATEGORY_ICONS.WrenchScrewdriverIcon} cat={selectedTab} />
-              ))}
-            </div>
-          </section>
-        </Reveal>
 
         {/* FAQ */}
         <Reveal>
