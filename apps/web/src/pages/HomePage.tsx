@@ -1,13 +1,13 @@
 import { useState } from "react"
 import { Link } from "@tanstack/react-router"
-import { ChevronRightIcon } from "@heroicons/react/24/outline"
+import { ChevronRightIcon, BoltIcon, ShieldCheckIcon } from "@heroicons/react/24/outline"
 import { CATEGORIES, TOOLS } from "@neostudio/shared"
 import { ToolCard, CATEGORY_ICONS } from "../components/ToolCard"
 import { FAQ } from "../components/FAQ"
 import { Reveal } from "../components/Reveal"
 import { AnimatedCounter } from "../components/AnimatedCounter"
 import { Header, Footer } from "../components/Layout"
-import Bento02 from "../components/ui/bento-02"
+import { SectionHeader } from "../components/SectionHeader"
 
 export default function HomePage() {
   const [selectedTab, setSelectedTab] = useState<string>("tools")
@@ -19,7 +19,7 @@ export default function HomePage() {
       <Header />
       <main className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
         {/* Hero — split kiri/kanan */}
-        <section className="pt-12 sm:pt-20 pb-12 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <section className="pt-24 sm:pt-32 pb-16 sm:pb-20 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div>
             <div className="inline-block nb-pill px-4 py-1.5 mb-6">
               <span className="text-[11px] font-mono uppercase tracking-widest text-cream">gratis · tanpa daftar · tanpa iklan</span>
@@ -62,18 +62,45 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Bento mockup kanan — tile kategori clickable */}
+          {/* Bento kanan — anchor + 8 kategori + 2 feature = 12 sel */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {CATEGORIES.map((c, i) => {
+            {/* Anchor tile (wide) */}
+            <Link
+              to="/tools"
+              className="nb-card nb-lift relative overflow-hidden p-5 flex flex-col items-start gap-2 cursor-pointer col-span-2"
+            >
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 opacity-40"
+                style={{
+                  background:
+                    "radial-gradient(ellipse 60% 80% at 70% 50%, rgba(245,222,179,0.10), transparent)",
+                }}
+              />
+              <div className="relative">
+                <span className="font-mono text-[11px] uppercase tracking-widest text-cream">
+                  Mulai cepat
+                </span>
+                <p className="font-head text-lg sm:text-xl tracking-tight mt-1.5">
+                  Buka di browser, langsung pakai
+                </p>
+                <span className="inline-flex items-center gap-1 text-xs text-muted-fg mt-2 group-hover:text-cream">
+                  Lihat semua tools
+                  <ChevronRightIcon className="w-3.5 h-3.5" aria-hidden />
+                </span>
+              </div>
+            </Link>
+
+            {/* 8 kategori tile */}
+            {CATEGORIES.map((c) => {
               const Icon = CATEGORY_ICONS[c.icon] ?? CATEGORY_ICONS.WrenchScrewdriverIcon
               const count = TOOLS.filter((t) => t.category === c.id).length
-              const wide = i === 0
               return (
                 <Link
                   key={c.id}
                   to="/tools"
                   search={{ cat: c.id }}
-                  className={`nb-card nb-lift p-4 flex flex-col items-start gap-2.5 cursor-pointer ${wide ? "sm:col-span-2" : ""}`}
+                  className="nb-card nb-lift p-4 flex flex-col items-start gap-2.5 cursor-pointer"
                 >
                   <div className="shrink-0 w-9 h-9 grid place-items-center rounded-lg border border-line bg-altar">
                     <Icon className="w-4 h-4 text-cream" aria-hidden />
@@ -85,22 +112,34 @@ export default function HomePage() {
                 </Link>
               )
             })}
+
+            {/* 2 feature tile (non-clickable, tanpa lift) */}
+            {[
+              { icon: BoltIcon, title: "Cepat & ringan", desc: "Load kecil, hasil keluar hitungan detik." },
+              { icon: ShieldCheckIcon, title: "Privasi dulu", desc: "Gak ada akun, gak ada pelacakan antar tool." },
+            ].map((f) => (
+              <div key={f.title} className="nb-card p-4 flex flex-col items-start gap-2.5">
+                <div className="shrink-0 w-9 h-9 grid place-items-center rounded-lg border border-line bg-altar">
+                  <f.icon className="w-4 h-4 text-cream" aria-hidden />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-medium text-sm leading-tight">{f.title}</p>
+                  <p className="text-[11px] text-muted-fg mt-0.5 leading-relaxed">{f.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
-        {/* Bento — kenapa neostudio */}
-        <Reveal>
-          <Bento02 />
-        </Reveal>
-
         {/* Bento kategori — tabs + 3 tool preview */}
         <Reveal>
-          <section aria-label="Pilih kategori" className="py-10 border-t border-line">
+          <section aria-label="Pilih kategori" className="py-16 sm:py-24">
             <div className="flex items-end justify-between mb-6 flex-wrap gap-4">
-              <div>
-                <h2 className="font-head text-2xl sm:text-3xl">Jelajahi kategori</h2>
-                <p className="text-sm text-muted-fg mt-1">{activeCat.desc}</p>
-              </div>
+              <SectionHeader
+                eyebrow="Kategori"
+                title="Jelajahi kategori"
+                desc={activeCat.desc}
+              />
               <Link to="/tools" search={{ cat: selectedTab }} className="text-sm text-cream hover:underline inline-flex items-center gap-1">
                 Lihat semua <ChevronRightIcon className="w-4 h-4" />
               </Link>
@@ -133,8 +172,14 @@ export default function HomePage() {
 
         {/* FAQ */}
         <Reveal>
-          <section aria-label="Pertanyaan umum" className="py-10 max-w-3xl mx-auto border-t border-line">
-            <h2 className="font-head text-2xl sm:text-3xl text-center mb-8">Pertanyaan Umum</h2>
+          <section aria-label="Pertanyaan umum" className="py-16 sm:py-24 max-w-3xl mx-auto">
+            <SectionHeader
+              align="center"
+              eyebrow="FAQ"
+              title="Pertanyaan Umum"
+              desc="Jawaban singkat buat hal yang paling sering ditanya."
+            />
+            <div className="mt-8">
             <FAQ
               groups={[
                 {
@@ -181,6 +226,7 @@ export default function HomePage() {
                 },
               ]}
             />
+            </div>
           </section>
         </Reveal>
       </main>
