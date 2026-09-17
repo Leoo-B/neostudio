@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router"
 import { ChevronRightIcon, BoltIcon, ShieldCheckIcon } from "@heroicons/react/24/outline"
+import { useState } from "react"
 import { CATEGORIES, TOOLS } from "@neostudio/shared"
 import { CategoryTile } from "../components/CategoryTile"
 import { FAQ } from "../components/FAQ"
@@ -10,6 +11,8 @@ import { SectionHeader } from "../components/SectionHeader"
 import { DeviceStrip } from "../components/DeviceStrip"
 
 export default function HomePage() {
+  const [openCat, setOpenCat] = useState<string | null>(null)
+
   return (
     <div className="min-h-dvh bg-bg">
       <Header />
@@ -88,9 +91,9 @@ export default function HomePage() {
               </div>
             </Link>
 
-            {/* 8 kategori tile — hover/tap expand */}
+            {/* 8 kategori tile — hover/tap expand (state di parent: cuma 1 open) */}
             {CATEGORIES.map((c) => (
-              <CategoryTile key={c.id} c={c} />
+              <CategoryTile key={c.id} c={c} open={openCat === c.id} onToggle={setOpenCat} />
             ))}
 
             {/* 2 feature tile (non-clickable, tanpa lift) */}

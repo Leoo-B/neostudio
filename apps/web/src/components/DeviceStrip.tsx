@@ -1,4 +1,15 @@
 import { useEffect, useState } from "react"
+import {
+  IconMapPin,
+  IconClock,
+  IconTimezone,
+  IconGlobe,
+  IconBattery1,
+  IconBattery3,
+  IconBattery4,
+  IconBatteryCharging2,
+  IconBatteryExclamation,
+} from "@tabler/icons-react"
 
 type WhereAmI = {
   ok: boolean
@@ -10,6 +21,7 @@ type WhereAmI = {
 }
 
 const API_BASE = import.meta.env.VITE_API_BASE?.replace(/\/$/, "") ?? ""
+const STROKE = 1.25
 
 /** offset menit → label zona waktu Indonesia */
 function zonaLabel(offsetMin: number | null): string | null {
@@ -20,14 +32,38 @@ function zonaLabel(offsetMin: number | null): string | null {
   return null
 }
 
-function Separator() {
-  return <span className="text-line" aria-hidden>·</span>
+type BatteryState = {
+  /** ikon sesuai level/charging */
+  Icon: (typeof IconBattery4) & { displayName?: string }
+  label: string
+  tone: string
+  charging: boolean
+}
+
+/** state-aware battery: ikon + warna dinamis */
+function batteryState(level: number | null, charging: boolean | undefined): BatteryState | null {
+  if (level === null) return null
+  const pct = Math.round(level * 100)
+  if (charging) {
+    return { Icon: IconBatteryCharging2, label: `${pct}%+`, tone: "text-cream", charging: true }
+  }
+  if (pct < 20) {
+    return { Icon: IconBattery1, label: `${pct}%`, tone: "text-red-400", charging: false }
+  }
+  if (pct < 50) {
+    return { Icon: IconBattery3, label: `${pct}%`, tone: "text-cream", charging: false }
+  }
+  return { Icon: IconBattery4, label: `${pct}%`, tone: "text-muted-fg", charging: false }
+}
+
+function Skeleton() {
+  return <span className="nb-skeleton inline-block w-24 h-3 rounded-sm" aria-hidden />
 }
 
 export function DeviceStrip() {
   const [info, setInfo] = useState<WhereAmI | null>(null)
   const [now, setNow] = useState<Date | null>(null)
-  const [baterai, setBaterai] = useState<string>("—")
+  const [bat, setBat] = useState<{ level: number | null; charging?: boolean } | null>(null)
 
   // fetch lokasi sekali per session
   useEffect(() => {
@@ -49,22 +85,15 @@ export function DeviceStrip() {
     type BatteryLike = { level: number; charging?: boolean; addEventListener?: (t: string, l: () => void) => void }
     const nav = navigator as Navigator & { getBattery?: () => Promise<BatteryLike> }
     if (!nav.getBattery) return
-    let battery: BatteryLike | null = null
     nav
       .getBattery()
       .then((b) => {
-        battery = b
-        const update = () => setBaterai(`${Math.round((b.level ?? 0) * 100)}%${b.charging ? "+" : ""}`)
+        const update = () => setBat({ level: b.level, charging: b.charging })
         update()
         b.addEventListener?.("levelchange", update)
         b.addEventListener?.("chargingchange", update)
       })
       .catch(() => {})
-    return () => {
-      if (battery?.addEventListener) {
-        // listener cleanup tidak critical — API deprecated, biarkan
-      }
-    }
   }, [])
 
   // jam per detik sesuai timezone IP
@@ -101,35 +130,62 @@ export function DeviceStrip() {
   const zona = zonaLabel(offsetMin)
 
   const lokasi = [info?.city, info?.country].filter(Boolean).join(", ") || null
+  const batState = batteryState(bat?.level ?? null, bat?.charging)
+
+  const ready = lokasi !== null
 
   return (
     <div className="border-b border-line bg-altar/60">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-9 flex items-center gap-4 text-[11px] font-mono text-muted-fg overflow-hidden whitespace-nowrap">
-        {lokasi ? (
-          <span className="text-fg/80">{lokasi}</span>
-        ) : (
-          <span className="animate-pulse">mendeteksi lokasi…</span>
-        )}
-        {zona ? (
-          <>
-            <Separator />
-            <span className="text-cream">{zona}</span>
-          </>
-        ) : null}
-        {jam ? (
-          <>
-            <Separator />
-            <span className="tabular-nums text-fg/80">{jam}</span>
-          </>
-        ) : null}
-        {info?.ip ? (
-          <>
-            <Separator />
-            <span className="hidden sm:inline">IP: {info.ip}</span>
-          </>
-        ) : null}
-        <Separator />
-        <span className="hidden sm:inline">baterai: {baterai}</span>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-2 sm:py-0 sm:h-9 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-0 text-[11px] font-mono">
+        {/* baris 1 (mobile) / kiri (desktop): lokasi · zona · jam */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {ready ? (
+            <span className="inline-flex items-center gap-1.5 text-fg/80">
+              <IconMapPin stroke={STROKE} className="w-3.5 h-3.5 text-muted-fg shrink-0" aria-hidden />
+              {lokasi}
+            </span>
+          ) : (
+            <Skeleton />
+          )}
+          {zona ? (
+            <span className="inline-flex sm:pl-3 sm:border-l sm:border-line items-center gap-1.5 text-cream">
+              <IconTimezone stroke={STROKE} className="w-3.5 h-3.5 shrink-0" aria-hidden />
+              {zona}
+            </span>
+          ) : null}
+          {jam ? (
+            <span className="inline-flex items-center gap-1.5 sm:pl-3 sm:border-l sm:border-line tabular-nums text-fg/80">
+              <IconClock stroke={STROKE} className="w-3.5 h-3.5 text-muted-fg shrink-0" aria-hidden />
+              {jam}
+            </span>
+          ) : null}
+        </div>
+
+        {/* baris 2 (mobile) / kanan (desktop): IP · baterai */}
+        <div className="flex items-center gap-2 sm:gap-3 sm:ml-auto">
+          {info?.ip ? (
+            <span className="inline-flex items-center gap-1.5 text-fg/80">
+              <IconGlobe stroke={STROKE} className="w-3.5 h-3.5 text-muted-fg shrink-0" aria-hidden />
+              {info.ip}
+            </span>
+          ) : null}
+          {batState ? (
+            <span className={`inline-flex items-center gap-1.5 sm:pl-3 sm:border-l sm:border-line ${batState.tone}`}>
+              {batState.charging ? (
+                <IconBatteryCharging2 stroke={STROKE} className="w-4 h-4 shrink-0" aria-hidden />
+              ) : (
+                <batState.Icon stroke={STROKE} className="w-4 h-4 shrink-0" aria-hidden />
+              )}
+              {batState.label}
+            </span>
+          ) : bat ? (
+            // level null (battery API tanpa value)
+            <span className="inline-flex items-center gap-1.5 text-muted-fg sm:pl-3 sm:border-l sm:border-line">
+              <IconBatteryExclamation stroke={STROKE} className="w-4 h-4 shrink-0" aria-hidden />
+              —
+            </span>
+          ) : null}
+        </div>
       </div>
     </div>
   )

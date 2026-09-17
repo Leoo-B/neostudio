@@ -1,25 +1,65 @@
-import { useState } from "react"
+import { useEffect, useRef } from "react"
 import { Link } from "@tanstack/react-router"
 import { ChevronDownIcon } from "@heroicons/react/24/outline"
 import { TOOLS, type CategoryDef } from "@neostudio/shared"
 import { CATEGORY_ICONS } from "./ToolCard"
 
-export function CategoryTile({ c }: { c: CategoryDef }) {
-  const [open, setOpen] = useState(false)
+type Props = {
+  c: CategoryDef
+  open: boolean
+  onToggle: (id: string | null) => void
+}
+
+export function CategoryTile({ c, open, onToggle }: Props) {
   const Icon = CATEGORY_ICONS[c.icon] ?? CATEGORY_ICONS.WrenchScrewdriverIcon
   const tools = TOOLS.filter((t) => t.category === c.id).slice(0, 3)
   const count = TOOLS.filter((t) => t.category === c.id).length
+  const ref = useRef<HTMLDivElement>(null)
+
+  // Escape → tutup
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onToggle(null)
+    }
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
+  }, [open, onToggle])
+
+  // tap luar → tutup (touch device: click di luar tile)
+  useEffect(() => {
+    if (!open) return
+    const onClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onToggle(null)
+    }
+    document.addEventListener("mousedown", onClick)
+    return () => document.removeEventListener("mousedown", onClick)
+  }, [open, onToggle])
+
+  const isTouch = typeof window !== "undefined" && window.matchMedia?.("(hover: none)").matches
 
   return (
     <div
-      className="nb-card nb-lift relative p-4 flex flex-col items-start gap-2.5 cursor-pointer"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-      onClick={() => setOpen((v) => !v)}
+      ref={ref}
+      className={`nb-card nb-lift relative p-4 flex flex-col items-start gap-2.5 cursor-pointer ${open ? "z-30" : ""}`}
+      onPointerEnter={(e) => {
+        // touch device: skip hover-open, biar click-toggle yang kerja
+        if (e.pointerType === "touch" || isTouch) return
+        onToggle(c.id)
+      }}
+      onPointerLeave={(e) => {
+        if (e.pointerType === "touch" || isTouch) return
+        onToggle(null)
+      }}
+      onClick={() => onToggle(open ? null : c.id)}
+      onBlur={(e) => {
+        // focus pindah ke luar tile → tutup; kalau pindah ke Link di dalam overlay, tetap open
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) onToggle(null)
+      }}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault()
-          setOpen((v) => !v)
+          onToggle(open ? null : c.id)
         }
       }}
       role="button"
@@ -43,10 +83,10 @@ export function CategoryTile({ c }: { c: CategoryDef }) {
         <p className="text-[11px] text-muted-fg mt-0.5 font-mono">{count} tools</p>
       </div>
 
-      {/* overlay preview — absolute, zero layout shift */}
+      {/* overlay preview — absolute, zero layout shift; z-30 di root saat open supaya gak tertimpa sibling */}
       {open ? (
         <div
-          className="absolute left-0 right-0 top-full z-20 mt-1 nb-card bg-card shadow-lift p-2 rounded-lg"
+          className="absolute left-0 right-0 top-full z-30 mt-1 nb-card bg-card shadow-lift p-2 rounded-lg"
           onClick={(e) => e.stopPropagation()}
         >
           <p className="text-[10px] font-mono uppercase tracking-widest text-cream px-2 py-1">
