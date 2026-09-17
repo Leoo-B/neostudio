@@ -85,7 +85,7 @@ export function CategoryTile({ c, open, onToggle }: Props) {
 
       {/* overlay preview — selalu mounted, animate opacity/scale; zero layout shift; z-30 di root saat open */}
       <div
-        className={`absolute left-0 right-0 top-full z-30 mt-1 nb-card bg-card shadow-lift p-2 rounded-lg origin-top transition-all duration-200 ease-smooth ${
+        className={`absolute left-0 right-0 top-full z-30 mt-1 nb-card nb-overlay-anim bg-card shadow-lift p-2 rounded-lg origin-top ${
           open
             ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
             : "opacity-0 scale-[0.97] -translate-y-1 pointer-events-none"
