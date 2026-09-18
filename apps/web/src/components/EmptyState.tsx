@@ -16,18 +16,8 @@ export function EmptyState({ q, onPick, onReset }: Props) {
   const reduced = useReducedMotion()
   const flyRef = useRef<HTMLDivElement>(null)
 
-  const dbg = (info: unknown) => {
-    const msg = typeof info === "string" ? info : JSON.stringify(info)
-    document.title = `FLY:${msg}`
-    const el = flyRef.current
-    if (el) el.setAttribute("data-dbg", `${el.getAttribute("data-dbg") ?? ""}|${msg}`)
-  }
-  dbg("render")
-
   useEffect(() => {
-    dbg("effect")
     const el = flyRef.current
-    dbg({ el: !!el })
     if (!el) return
     let anim: ReturnType<typeof lottie.loadAnimation> | undefined
     try {
@@ -38,12 +28,10 @@ export function EmptyState({ q, onPick, onReset }: Props) {
         autoplay: true,
         animationData: flyAnim,
       })
-      dbg({ ok: true, frames: anim.totalFrames, svg: el.querySelectorAll("svg").length })
-    } catch (e) {
-      dbg({ ok: false, err: String(e) })
+    } catch {
+      // lottie gagal load → container tetap kosong, ikon sampah masih utuh
     }
     return () => {
-      dbg("cleanup")
       anim?.destroy()
     }
   }, [])
