@@ -85,13 +85,25 @@ export function DeviceStrip() {
   }, [])
 
   // baterai (deprecated API — graceful fallback wajib)
+  // catatan: Chromium throttle update level internal (spec: "left to the
+  // implementation"). pool 2.5s + refresh on tab focus memastikan setiap value
+  // baru yang browser keluarin langsung kebaca tanpa delay tambahan dari sisi kita.
   useEffect(() => {
-    type BatteryLike = { level: number; charging?: boolean; addEventListener?: (t: string, l: () => void) => void; removeEventListener?: (t: string, l: () => void) => void }
+    type BatteryLike = {
+      level: number
+      charging?: boolean
+      addEventListener?: (t: string, l: () => void) => void
+      removeEventListener?: (t: string, l: () => void) => void
+    }
     const nav = navigator as Navigator & { getBattery?: () => Promise<BatteryLike> }
     if (!nav.getBattery) return
     let battery: BatteryLike | null = null
     let update: (() => void) | null = null
     let pollId: ReturnType<typeof setInterval> | null = null
+
+    const onVisible = () => {
+      if (document.visibilityState === "visible") update?.()
+    }
 
     nav
       .getBattery()
@@ -101,8 +113,10 @@ export function DeviceStrip() {
         update()
         b.addEventListener?.("levelchange", update)
         b.addEventListener?.("chargingchange", update)
-        // backup: polling setiap 10s (sebagian browser gak fire event real-time)
-        pollId = setInterval(() => update?.(), 10_000)
+        // aggressive pool: catch value secepat browser kasih (throttle ~1 menit di Chromium)
+        pollId = setInterval(() => update?.(), 2_500)
+        // refresh instan saat tab jadi aktif lagi (balik dari background)
+        document.addEventListener("visibilitychange", onVisible)
       })
       .catch(() => {})
 
@@ -112,6 +126,7 @@ export function DeviceStrip() {
         battery.removeEventListener?.("chargingchange", update)
       }
       if (pollId) clearInterval(pollId)
+      document.removeEventListener("visibilitychange", onVisible)
     }
   }, [])
 
