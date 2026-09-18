@@ -5,6 +5,7 @@ import { CATEGORIES, TOOLS } from "@neostudio/shared"
 import { Header, Footer } from "../components/Layout"
 import { ToolCard, CATEGORY_ICONS } from "../components/ToolCard"
 import { FilterChips, type ChipFilter } from "../components/ui/FilterChips"
+import { EmptyState } from "../components/EmptyState"
 
 export default function ToolsPage() {
   const search = useSearch({ from: "/tools" })
@@ -80,10 +81,7 @@ export default function ToolsPage() {
               </button>
             </div>
             {results.length === 0 ? (
-              <div className="nb-card p-10 text-center">
-                <p className="font-head text-lg">Tidak ada tool yang cocok</p>
-                <p className="text-sm text-muted-fg mt-2">Coba kata kunci lain, mis. “qr”, “tiktok”, atau “zodiak”.</p>
-              </div>
+              <EmptyState q={q} onPick={(kw) => setQ(kw)} onReset={() => setQ("")} />
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {results.map((t) => {
