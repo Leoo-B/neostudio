@@ -489,12 +489,29 @@ samp {
   transform: translateY(-3px);
 }
 
-/* overlay kategori: transition butuh specificity tinggi — .nb-card di file ini
-   menang dari transition-all Tailwind karena layer order (sama kayak nb-pill dulu) */
-.nb-overlay-anim {
-  transition:
-    opacity 300ms cubic-bezier(0.16, 1, 0.3, 1),
-    transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+/* overlay kategori: accordion reveal (grid-rows 0fr→1fr) — "kebuka ke bawah",
+   staggered link fade di dalamnya. specificity tinggi karena .nb-card
+   di file ini menang dari transition Tailwind (layer order, sama kayak nb-pill) */
+.t-cat-overlay {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.t-cat-overlay.is-open {
+  grid-template-rows: 1fr;
+}
+.t-cat-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+.t-cat-link {
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 200ms cubic-bezier(0.22, 1, 0.36, 1), transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.is-open .t-cat-link {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* ─── scroll progress bar (atas halaman) ─── */

@@ -48,7 +48,7 @@ export function CategoryTile({ c, open, onToggle }: Props) {
   return (
     <div
       ref={ref}
-      className={`nb-card nb-lift relative p-4 flex flex-col items-start gap-2.5 cursor-pointer ${open ? "z-30" : ""}`}
+      className={`nb-card relative p-4 flex flex-col items-start gap-2.5 cursor-pointer ${open ? "z-30" : ""}`}
       onPointerEnter={(e) => {
         // touch device: skip hover-open, biar click-toggle yang kerja
         if (e.pointerType === "touch" || isTouch || pinned) return
@@ -100,41 +100,44 @@ export function CategoryTile({ c, open, onToggle }: Props) {
         <p className="text-[11px] text-muted-fg mt-0.5 font-mono">{count} tools</p>
       </div>
 
-      {/* overlay preview — selalu mounted, animate opacity/scale; zero layout shift; z-30 di root saat open */}
+      {/* overlay preview — accordion reveal (kebuka ke bawah) + staggered link fade;
+          selalu mounted, zero layout shift; z-30 di root saat open supaya gak tertimpa sibling */}
       <div
-        className={`absolute left-0 right-0 top-full z-30 mt-1 nb-card nb-overlay-anim bg-card shadow-lift p-2 rounded-lg origin-top ${
-          open
-            ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
-            : "opacity-0 scale-95 -translate-y-2.5 pointer-events-none"
-        }`}
+        className={`absolute left-0 right-0 top-full z-30 mt-1 nb-card t-cat-overlay bg-card shadow-lift rounded-lg ${open ? "is-open" : ""}`}
         aria-hidden={!open}
         onClick={(e) => e.stopPropagation()}
         onPointerEnter={(e) => e.stopPropagation()}
         onPointerLeave={(e) => e.stopPropagation()}
       >
-        <p className="text-[10px] font-mono uppercase tracking-widest text-cream px-2 py-1">
-          {c.tagline}
-        </p>
-        {tools.map((t) => (
-          <Link
-            key={t.id}
-            to="/tool/$id"
-            params={{ id: t.id }}
-            search={{ cat: c.id }}
-            tabIndex={open ? undefined : -1}
-            className="block px-2 py-1.5 text-xs text-fg/80 hover:text-cream hover:bg-altar rounded truncate transition-colors duration-100"
-          >
-            {t.name}
-          </Link>
-        ))}
-        <Link
-          to="/tools"
-          search={{ cat: c.id }}
-          tabIndex={open ? undefined : -1}
-          className="block px-2 py-1.5 text-[11px] text-muted-fg hover:text-cream transition-colors duration-100"
-        >
-          Lihat semua {count} tools →
-        </Link>
+        <div className="t-cat-inner">
+          <div className="p-2">
+            <p className="text-[10px] font-mono uppercase tracking-widest text-cream px-2 py-1">
+              {c.tagline}
+            </p>
+            {tools.map((t, i) => (
+              <Link
+                key={t.id}
+                to="/tool/$id"
+                params={{ id: t.id }}
+                search={{ cat: c.id }}
+                tabIndex={open ? undefined : -1}
+                style={{ transitionDelay: open ? `${60 + i * 45}ms` : "0ms" }}
+                className="t-cat-link block px-2 py-1.5 text-xs text-fg/80 hover:text-cream hover:bg-altar rounded truncate"
+              >
+                {t.name}
+              </Link>
+            ))}
+            <Link
+              to="/tools"
+              search={{ cat: c.id }}
+              tabIndex={open ? undefined : -1}
+              style={{ transitionDelay: open ? `${60 + tools.length * 45}ms` : "0ms" }}
+              className="t-cat-link block px-2 py-1.5 text-[11px] text-muted-fg hover:text-cream"
+            >
+              Lihat semua {count} tools →
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   )
