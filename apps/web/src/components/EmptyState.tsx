@@ -1,5 +1,6 @@
+import { useEffect, useRef } from "react"
 import { motion, useReducedMotion } from "motion/react"
-import { Lottie } from "lottie-react"
+import lottie from "lottie-web"
 import { IconTrash } from "@tabler/icons-react"
 import flyAnim from "../assets/fly.json"
 
@@ -13,6 +14,35 @@ const SUGGESTIONS = ["qr", "tiktok", "zodiak"]
 
 export function EmptyState({ q, onPick, onReset }: Props) {
   const reduced = useReducedMotion()
+  const flyRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = flyRef.current
+    if (!el) return
+    let anim: ReturnType<typeof lottie.loadAnimation> | undefined
+    try {
+      anim = lottie.loadAnimation({
+        container: el,
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        animationData: flyAnim,
+      })
+      ;(window as unknown as { __flyDebug?: unknown }).__flyDebug = {
+        ok: true,
+        frames: anim.totalFrames,
+        svg: el.querySelectorAll("svg").length,
+      }
+    } catch (e) {
+      ;(window as unknown as { __flyDebug?: unknown }).__flyDebug = {
+        ok: false,
+        err: String(e),
+      }
+    }
+    return () => {
+      anim?.destroy()
+    }
+  }, [])
 
   return (
     <motion.div
@@ -55,11 +85,10 @@ export function EmptyState({ q, onPick, onReset }: Props) {
               times: [0, 0.16, 0.33, 0.5, 0.66, 0.83, 1],
             }}
           >
-            <Lottie
-              src={flyAnim}
-              loop
-              autoplay
+            <div
+              ref={flyRef}
               style={{ width: 40, height: 40 }}
+              aria-hidden
             />
           </motion.div>
         </div>
