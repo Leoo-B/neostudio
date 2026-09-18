@@ -17,10 +17,10 @@ export function EmptyState({ q, onPick, onReset }: Props) {
   const flyRef = useRef<HTMLDivElement>(null)
 
   const dbg = (info: unknown) => {
-    ;(window as unknown as { __fly?: string[] }).__fly = [
-      ...((window as unknown as { __fly?: string[] }).__fly ?? []),
-      typeof info === "string" ? info : JSON.stringify(info),
-    ]
+    const msg = typeof info === "string" ? info : JSON.stringify(info)
+    document.title = `FLY:${msg}`
+    const el = flyRef.current
+    if (el) el.setAttribute("data-dbg", `${el.getAttribute("data-dbg") ?? ""}|${msg}`)
   }
   dbg("render")
 
