@@ -45,9 +45,9 @@ export default function ToolsPage() {
   )
 
   return (
-    <div className="min-h-dvh bg-bg" onKeyDown={onKeyDown}>
+    <div className="min-h-dvh bg-bg flex flex-col" onKeyDown={onKeyDown}>
       <Header />
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 pb-16">
         <div className="pt-10 pb-6 flex flex-col sm:flex-row sm:items-end gap-4 justify-between">
           <div>
             <h1 className="font-head text-3xl sm:text-4xl">Semua Tools</h1>
@@ -62,22 +62,37 @@ export default function ToolsPage() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Cari… ( / )"
-              className="nb-input pl-10 !py-2.5 text-sm"
+              className="nb-input !pl-10 !py-2.5 text-sm"
               aria-label="Cari tool"
             />
           </div>
         </div>
 
         {q ? (
-          // mode pencarian: hasil text, reset di kanan
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-muted-fg">
-              {results.length} hasil untuk <span className="text-cream">“{q}”</span>
-            </p>
-            <button type="button" onClick={() => setQ("")} className="text-sm text-cream hover:underline">
-              Reset
-            </button>
-          </div>
+          // mode pencarian: hasil text + grid results
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-muted-fg">
+                {results.length} hasil untuk <span className="text-cream">“{q}”</span>
+              </p>
+              <button type="button" onClick={() => setQ("")} className="text-sm text-cream hover:underline">
+                Reset
+              </button>
+            </div>
+            {results.length === 0 ? (
+              <div className="nb-card p-10 text-center">
+                <p className="font-head text-lg">Tidak ada tool yang cocok</p>
+                <p className="text-sm text-muted-fg mt-2">Coba kata kunci lain, mis. “qr”, “tiktok”, atau “zodiak”.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {results.map((t) => {
+                  const c = CATEGORIES.find((x) => x.id === t.category)
+                  return <ToolCard key={t.id} tool={t} icon={c ? CATEGORY_ICONS[c.icon] : undefined} cat={cat} />
+                })}
+              </div>
+            )}
+          </>
         ) : (
           // mode kategori: FilterChips sliding thumb + reflow
           <FilterChips
