@@ -171,11 +171,13 @@ samp {
   }
 }
 
-/* ─── empty state: lalat muter mengelilingi lup ─── */
+/* ─── empty state: lalat muter erratic mengelilingi tempat sampah ─── */
+/* path irregular (figure-8 menyempit) — bukan lingkaran mulus, kayak lalat asli */
 .nb-orbit {
-  offset-path: ellipse(56px 34px at center);
+  offset-path: path("M 70,0 C 95,18 95,42 70,52 C 45,62 20,52 8,38 C -4,24 -2,8 18,2 C 38,-4 52,8 62,20 C 70,30 66,44 50,50 C 34,56 14,48 8,32 C 3,18 12,2 30,-4 C 48,-10 62,0 70,12");
   offset-distance: 0%;
-  animation: nb-orbit 6s linear infinite;
+  offset-rotate: auto;
+  animation: nb-orbit 7s linear infinite;
   will-change: offset-distance;
 }
 @keyframes nb-orbit {

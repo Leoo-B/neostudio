@@ -1,5 +1,7 @@
 import { motion, useReducedMotion } from "motion/react"
-import { IconZoomQuestion, IconBug } from "@tabler/icons-react"
+import { Lottie } from "lottie-react"
+import { IconTrash } from "@tabler/icons-react"
+import flyAnim from "../assets/fly.json"
 
 type Props = {
   q: string
@@ -19,24 +21,48 @@ export function EmptyState({ q, onPick, onReset }: Props) {
       transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 380, damping: 30, mass: 0.7 }}
       className="nb-card p-10 text-center overflow-hidden"
     >
-      {/* lup + lalat muter */}
-      <div className="relative h-28 mx-auto w-fit">
+      {/* tempat sampah + lalat erratic */}
+      <div className="relative h-32 mx-auto w-40">
+        {/* sampah: float halus */}
         <motion.div
-          animate={reduced ? undefined : { y: [0, -5, 0] }}
-          transition={reduced ? undefined : { duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          className="relative z-10 inline-block"
+          animate={reduced ? undefined : { y: [0, -4, 0] }}
+          transition={reduced ? undefined : { duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10"
         >
-          <IconZoomQuestion stroke={1.25} className="w-16 h-16 text-cream" aria-hidden />
+          <IconTrash stroke={1.25} className="w-16 h-16 text-muted-fg" aria-hidden />
         </motion.div>
-        {/* lalat: orbit ellipse via offset-path */}
-        <span className={`absolute inset-0 grid place-items-center ${reduced ? "nb-orbit-paused" : "nb-orbit"}`}>
-          <IconBug
-            stroke={1.5}
-            className="w-5 h-5 text-muted-fg"
-            style={{ rotate: "45deg" }}
-            aria-hidden
-          />
-        </span>
+
+        {/* lalat: Lottie (sayap mengepak) + orbit path irregular + jitter dart */}
+        <div
+          className={`absolute inset-0 grid place-items-center ${reduced ? "nb-orbit-paused" : "nb-orbit"}`}
+          aria-hidden
+        >
+          <motion.div
+            animate={
+              reduced
+                ? undefined
+                : {
+                    // jitter dart singkat — lalat gak pernah statis
+                    x: [0, 3, -2, 4, -1, 2, 0],
+                    y: [0, -2, 3, -1, 2, -3, 0],
+                    rotate: [0, 8, -5, 10, -3, 5, 0],
+                  }
+            }
+            transition={{
+              duration: 1.4,
+              repeat: Infinity,
+              ease: "easeInOut",
+              times: [0, 0.16, 0.33, 0.5, 0.66, 0.83, 1],
+            }}
+          >
+            <Lottie
+              src={flyAnim}
+              loop
+              autoplay
+              style={{ width: 40, height: 40 }}
+            />
+          </motion.div>
+        </div>
       </div>
 
       <p className="font-head text-lg mt-4">
