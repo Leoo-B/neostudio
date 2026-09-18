@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { Link } from "@tanstack/react-router"
-import { ChevronDownIcon } from "@heroicons/react/24/outline"
+import { IconChevronDown } from "@tabler/icons-react"
 import { TOOLS, type CategoryDef } from "@neostudio/shared"
 import { CATEGORY_ICONS } from "./ToolCard"
 
@@ -11,7 +11,7 @@ type Props = {
 }
 
 export function CategoryTile({ c, open, onToggle }: Props) {
-  const Icon = CATEGORY_ICONS[c.icon] ?? CATEGORY_ICONS.WrenchScrewdriverIcon
+  const Icon = CATEGORY_ICONS[c.icon] ?? CATEGORY_ICONS.IconTool
   const tools = TOOLS.filter((t) => t.category === c.id).slice(0, 3)
   const count = TOOLS.filter((t) => t.category === c.id).length
   const ref = useRef<HTMLDivElement>(null)
@@ -91,7 +91,7 @@ export function CategoryTile({ c, open, onToggle }: Props) {
           <p className="font-medium text-sm leading-tight">{c.name}</p>
           <span className="inline-flex items-center gap-1 text-[10px] font-mono text-muted-fg shrink-0">
             {count}
-            <ChevronDownIcon
+            <IconChevronDown
               className={`w-3 h-3 t-accordion-icon ${open ? "rotate-180" : ""}`}
               aria-hidden
             />

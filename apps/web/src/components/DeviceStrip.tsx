@@ -21,7 +21,6 @@ type WhereAmI = {
 }
 
 const API_BASE = import.meta.env.VITE_API_BASE?.replace(/\/$/, "") ?? ""
-const STROKE = 1.25
 
 /** offset menit → label zona waktu Indonesia */
 function zonaLabel(offsetMin: number | null): string | null {
@@ -175,7 +174,7 @@ export function DeviceStrip() {
         <div className="flex items-center gap-2 sm:gap-3">
           {ready ? (
             <span className="inline-flex items-center gap-1.5 text-fg/80">
-              <IconMapPin stroke={STROKE} className="w-3.5 h-3.5 text-muted-fg shrink-0" aria-hidden />
+              <IconMapPin className="w-3.5 h-3.5 text-muted-fg shrink-0" aria-hidden />
               {lokasi}
             </span>
           ) : (
@@ -185,7 +184,7 @@ export function DeviceStrip() {
             <>
               <Sep />
               <span className="inline-flex sm:pl-3 sm:border-l sm:border-line items-center gap-1.5 text-cream">
-                <IconTimezone stroke={STROKE} className="w-3.5 h-3.5 shrink-0" aria-hidden />
+                <IconTimezone className="w-3.5 h-3.5 shrink-0" aria-hidden />
                 {zona}
               </span>
             </>
@@ -194,7 +193,7 @@ export function DeviceStrip() {
             <>
               <Sep />
               <span className="inline-flex items-center gap-1.5 sm:pl-3 sm:border-l sm:border-line tabular-nums text-fg/80">
-                <IconClock stroke={STROKE} className="w-3.5 h-3.5 text-muted-fg shrink-0" aria-hidden />
+                <IconClock className="w-3.5 h-3.5 text-muted-fg shrink-0" aria-hidden />
                 {jam}
               </span>
             </>
@@ -205,7 +204,7 @@ export function DeviceStrip() {
         <div className="flex items-center gap-2 sm:gap-3 sm:ml-auto">
           {info?.ip ? (
             <span className="inline-flex items-center gap-1.5 text-fg/80">
-              <IconWorld stroke={STROKE} className="w-3.5 h-3.5 text-muted-fg shrink-0" aria-hidden />
+              <IconWorld className="w-3.5 h-3.5 text-muted-fg shrink-0" aria-hidden />
               {info.ip}
             </span>
           ) : null}
@@ -214,9 +213,9 @@ export function DeviceStrip() {
               <Sep />
               <span className={`inline-flex items-center gap-1.5 sm:pl-3 sm:border-l sm:border-line ${batState.tone}`}>
               {batState.charging ? (
-                <IconBatteryCharging2 stroke={STROKE} className="w-4 h-4 shrink-0" aria-hidden />
+                <IconBatteryCharging2 className="w-4 h-4 shrink-0" aria-hidden />
               ) : (
-                <batState.Icon stroke={STROKE} className="w-4 h-4 shrink-0" aria-hidden />
+                <batState.Icon className="w-4 h-4 shrink-0" aria-hidden />
               )}
               {batState.label}
             </span>
@@ -224,7 +223,7 @@ export function DeviceStrip() {
           ) : bat ? (
             // level null (battery API tanpa value)
             <span className="inline-flex items-center gap-1.5 text-muted-fg sm:pl-3 sm:border-l sm:border-line">
-              <IconBatteryExclamation stroke={STROKE} className="w-4 h-4 shrink-0" aria-hidden />
+              <IconBatteryExclamation className="w-4 h-4 shrink-0" aria-hidden />
               —
             </span>
           ) : null}

@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react"
-import { CheckCircleIcon } from "@heroicons/react/24/solid"
+import { IconCircleCheckFilled } from "@tabler/icons-react"
 
 type Toast = { id: number; msg: string }
 
@@ -43,7 +43,7 @@ function ToastItem({ msg }: { msg: string }) {
       role="status"
       aria-live="polite"
     >
-      <CheckCircleIcon className="w-5 h-5 text-cream shrink-0" />
+      <IconCircleCheckFilled className="w-5 h-5 text-cream shrink-0" />
       <span>{msg}</span>
     </div>
   )

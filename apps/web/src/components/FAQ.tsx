@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { ChevronDownIcon } from "@heroicons/react/24/outline"
+import { IconChevronDown } from "@tabler/icons-react"
 
 type QA = { q: string; a: string }
 type Group = { title: string; items: QA[] }
@@ -28,7 +28,7 @@ export function FAQ({ groups }: { groups: Group[] }) {
                     className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left cursor-pointer bg-transparent border-none"
                   >
                     <span className="font-medium text-sm sm:text-base">{it.q}</span>
-                    <ChevronDownIcon className="t-accordion-icon w-5 h-5 shrink-0 text-muted-fg" />
+                    <IconChevronDown className="t-accordion-icon w-5 h-5 shrink-0 text-muted-fg" />
                   </button>
                   <div
                     id={panelId}

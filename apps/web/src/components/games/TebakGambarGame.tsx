@@ -4,7 +4,7 @@ import { runTool } from "../../lib/run"
 import { pickStr, resolvePayload, toUrl } from "../../lib/results"
 import { GameHud, useCountdown } from "./GameHud"
 import { useGameConfetti } from "./useGameConfetti"
-import { TrophyIcon, ArrowPathIcon, CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline"
+import { IconTrophy, IconReload, IconCircleCheck, IconCircleX } from "@tabler/icons-react"
 
 const GAME_SECONDS = 90
 const POIN_BENAR = 5
@@ -90,12 +90,12 @@ export function TebakGambarGame({ tool, res, params }: { tool: ToolDef; res: Api
   if (selesai) {
     return (
       <div className="nb-card p-8 text-center flex flex-col items-center gap-4" aria-live="polite">
-        <TrophyIcon className="w-12 h-12 text-cream" aria-hidden />
+        <IconTrophy className="w-12 h-12 text-cream" aria-hidden />
         <p className="font-head text-2xl">Waktu habis!</p>
         <p className="text-muted-fg">Skor akhir kamu</p>
         <p className="font-head text-5xl text-cream tabular-nums">{skor}</p>
         <button onClick={mainLagi} className="nb-btn mt-2 inline-flex items-center gap-2 min-h-[44px]">
-          <ArrowPathIcon className="w-4 h-4" aria-hidden /> Main Lagi
+          <IconReload className="w-4 h-4" aria-hidden /> Main Lagi
         </button>
       </div>
     )
@@ -155,7 +155,7 @@ export function TebakGambarGame({ tool, res, params }: { tool: ToolDef; res: Api
           {mengambil ? (
             <span className="inline-block w-4 h-4 border-2 border-line border-t-cream rounded-full animate-spin" aria-hidden />
           ) : (
-            <ArrowPathIcon className="w-4 h-4" aria-hidden />
+            <IconReload className="w-4 h-4" aria-hidden />
           )}
           {mengambil ? "Memuat…" : "Lewati"}
         </button>
@@ -163,7 +163,7 @@ export function TebakGambarGame({ tool, res, params }: { tool: ToolDef; res: Api
       <div className="min-h-[28px] mt-3" aria-live="polite">
         {feedback && (
           <p className={`flex items-center gap-1.5 text-sm font-medium ${feedback.benar ? "text-cream" : "text-danger"}`}>
-            {feedback.benar ? <CheckCircleIcon className="w-4 h-4" aria-hidden /> : <XCircleIcon className="w-4 h-4" aria-hidden />}
+            {feedback.benar ? <IconCircleCheck className="w-4 h-4" aria-hidden /> : <IconCircleX className="w-4 h-4" aria-hidden />}
             {feedback.text}
             {gagal && <span className="text-muted-fg text-xs">(soal tidak berubah)</span>}
           </p>

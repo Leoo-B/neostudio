@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from "react"
-import { FireIcon, ClockIcon } from "@heroicons/react/24/solid"
+import { IconFlameFilled, IconClockFilled } from "@tabler/icons-react"
 
 export function GameHud({ skor, detik, maxDetik, label }: { skor: number; detik?: number; maxDetik?: number; label?: string }) {
   const maut = detik !== undefined && maxDetik !== undefined && detik <= 10
   return (
     <div className="flex items-center justify-between gap-3 mb-4">
       <div className="inline-flex items-center gap-2 nb-card px-4 py-2">
-        <FireIcon className="w-5 h-5 text-cream" aria-hidden />
+        <IconFlameFilled className="w-5 h-5 text-cream" aria-hidden />
         <span className="font-head text-xl text-cream tabular-nums" aria-label={`Skor ${skor}`}>{skor}</span>
         {label && <span className="text-[11px] uppercase tracking-widest text-muted-fg ml-1">{label}</span>}
       </div>
@@ -16,7 +16,7 @@ export function GameHud({ skor, detik, maxDetik, label }: { skor: number; detik?
           role="timer"
           aria-label={`Sisa waktu ${detik} detik`}
         >
-          <ClockIcon className={`w-5 h-5 ${maut ? "text-danger" : "text-muted-fg"}`} aria-hidden />
+          <IconClockFilled className={`w-5 h-5 ${maut ? "text-danger" : "text-muted-fg"}`} aria-hidden />
           <span className={`font-head text-xl tabular-nums ${maut ? "text-danger" : ""}`}>{detik}</span>
         </div>
       )}

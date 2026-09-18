@@ -6,7 +6,7 @@ import { Header, Footer } from "../components/Layout"
 import { useToast } from "../components/Toast"
 import { ResultView } from "../components/ResultView"
 import { runTool } from "../lib/run"
-import { ExclamationTriangleIcon, ArrowRightIcon, ClipboardIcon } from "@heroicons/react/24/outline"
+import { IconAlertTriangle, IconArrowRight, IconClipboard } from "@tabler/icons-react"
 
 export default function ToolPage() {
   const { id } = useParams({ strict: false }) as { id?: string }
@@ -106,13 +106,13 @@ export default function ToolPage() {
         {query.isError && (
           <div className="nb-card p-5 border-danger nb-error-shake">
             <div className="flex items-start gap-3">
-              <ExclamationTriangleIcon className="w-6 h-6 text-danger shrink-0" />
+              <IconAlertTriangle className="w-6 h-6 text-danger shrink-0" />
               <div className="flex-1">
                 <p className="font-head">Gagal menjalankan tool</p>
                 <p className="text-muted-fg text-sm mt-1">{query.error?.message ?? "Terjadi kesalahan. Ulangi sebentar lagi."}</p>
                 {fallback && (
                   <Link to="/tool/$id" params={{ id: fallback.id }} className="nb-btn inline-flex items-center gap-2 mt-4 text-sm">
-                    Coba {fallback.name} <ArrowRightIcon className="w-4 h-4" />
+                    Coba {fallback.name} <IconArrowRight className="w-4 h-4" />
                   </Link>
                 )}
               </div>
@@ -194,7 +194,7 @@ function PasteButton({ onPaste }: { onPaste: (v: string) => void }) {
       className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 border border-line hover:bg-muted transition-colors cursor-pointer"
       title="Tempel dari clipboard"
     >
-      <ClipboardIcon className="w-3.5 h-3.5" /> Tempel
+      <IconClipboard className="w-3.5 h-3.5" /> Tempel
     </button>
   )
 }

@@ -4,7 +4,7 @@ import { runTool } from "../../lib/run"
 import { pickStr, resolvePayload } from "../../lib/results"
 import { GameHud } from "./GameHud"
 import { useGameConfetti } from "./useGameConfetti"
-import { CheckCircleIcon, ArrowPathIcon, XCircleIcon } from "@heroicons/react/24/outline"
+import { IconCircleCheck, IconReload, IconCircleX } from "@tabler/icons-react"
 
 /** Poin per slot (atas paling besar), total = 100. Fallback proporsional kalau N>8. */
 function poinPerSlot(n: number): number[] {
@@ -110,12 +110,12 @@ export function Family100Game({ tool, res, params }: { tool: ToolDef; res: ApiRe
   if (done) {
     return (
       <div className="nb-card p-8 text-center flex flex-col items-center gap-4" aria-live="polite">
-        <CheckCircleIcon className="w-12 h-12 text-cream" aria-hidden />
+        <IconCircleCheck className="w-12 h-12 text-cream" aria-hidden />
         <p className="font-head text-2xl">Semua jawaban ditemukan!</p>
         <p className="text-muted-fg">Skor</p>
         <p className="font-head text-5xl text-cream tabular-nums">{skor}</p>
         <button onClick={mainLagi} className="nb-btn mt-2 inline-flex items-center gap-2 min-h-[44px]" disabled={mengambil}>
-          <ArrowPathIcon className="w-4 h-4" aria-hidden /> Main Lagi
+          <IconReload className="w-4 h-4" aria-hidden /> Main Lagi
         </button>
       </div>
     )
@@ -126,7 +126,7 @@ export function Family100Game({ tool, res, params }: { tool: ToolDef; res: ApiRe
       <div className="nb-card p-8 text-center flex flex-col items-center gap-4" aria-live="polite">
         <p className="font-head text-xl">Gagal mengambil soal</p>
         <button onClick={mainLagi} className="nb-btn mt-2 inline-flex items-center gap-2 min-h-[44px]" disabled={mengambil}>
-          <ArrowPathIcon className="w-4 h-4" aria-hidden /> Main Lagi
+          <IconReload className="w-4 h-4" aria-hidden /> Main Lagi
         </button>
       </div>
     )
@@ -160,7 +160,7 @@ export function Family100Game({ tool, res, params }: { tool: ToolDef; res: ApiRe
       <div className="min-h-[28px] mb-4" aria-live="polite">
         {feedback && (
           <p className={`flex items-center gap-1.5 text-sm font-medium ${feedback.ok ? "text-cream" : "text-danger"}`}>
-            {feedback.ok ? <CheckCircleIcon className="w-4 h-4" aria-hidden /> : <XCircleIcon className="w-4 h-4" aria-hidden />}
+            {feedback.ok ? <IconCircleCheck className="w-4 h-4" aria-hidden /> : <IconCircleX className="w-4 h-4" aria-hidden />}
             {feedback.text}
           </p>
         )}
@@ -174,7 +174,7 @@ export function Family100Game({ tool, res, params }: { tool: ToolDef; res: ApiRe
               <li key={i} className="flex items-center gap-3 nb-card px-4 py-2 t-fade-slide">
                 <span className="w-14 shrink-0 text-right font-head text-sm text-cream tabular-nums">{f.poin} poin</span>
                 <span className="flex-1 font-medium break-words">{f.jawaban}</span>
-                <CheckCircleIcon className="w-5 h-5 text-cream shrink-0" aria-hidden />
+                <IconCircleCheck className="w-5 h-5 text-cream shrink-0" aria-hidden />
               </li>
             ))}
           </ul>

@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from "react"
 import { useSearch, useRouter } from "@tanstack/react-router"
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline"
+import { IconSearch } from "@tabler/icons-react"
 import { CATEGORIES, TOOLS } from "@neostudio/shared"
 import { Header, Footer } from "../components/Layout"
 import { ToolCard, CATEGORY_ICONS } from "../components/ToolCard"
@@ -57,7 +57,7 @@ export default function ToolsPage() {
             </p>
           </div>
           <div className="relative w-full sm:w-72">
-            <MagnifyingGlassIcon className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-muted-fg pointer-events-none" />
+            <IconSearch className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-muted-fg pointer-events-none" />
             <input
               ref={searchInputRef}
               value={q}

@@ -4,7 +4,7 @@ import { runTool } from "../../lib/run"
 import { pickStr, resolvePayload } from "../../lib/results"
 import { GameHud, useCountdown } from "./GameHud"
 import { useGameConfetti } from "./useGameConfetti"
-import { LightBulbIcon, ArrowPathIcon, CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline"
+import { IconBulb, IconReload, IconCircleCheck, IconCircleX } from "@tabler/icons-react"
 
 const POIN_BENAR = 10
 const BIAYA_CLUE = 5
@@ -96,7 +96,7 @@ export function MathQuizGame({ tool, res, params }: { tool: ToolDef; res: ApiRes
         <p className="text-muted-fg">Skor akhir kamu</p>
         <p className="font-head text-5xl text-cream tabular-nums">{skor}</p>
         <button onClick={mainLagi} className="nb-btn mt-2 inline-flex items-center gap-2 min-h-[44px]">
-          <ArrowPathIcon className="w-4 h-4" aria-hidden /> Main Lagi
+          <IconReload className="w-4 h-4" aria-hidden /> Main Lagi
         </button>
       </div>
     )
@@ -142,16 +142,16 @@ export function MathQuizGame({ tool, res, params }: { tool: ToolDef; res: ApiRes
           title={skor < BIAYA_CLUE ? "Poin kurang dari 5" : undefined}
           className="nb-btn min-h-[44px] inline-flex items-center justify-center gap-2 disabled:opacity-40"
         >
-          <LightBulbIcon className="w-4 h-4" aria-hidden /> Clue (−{BIAYA_CLUE} poin)
+          <IconBulb className="w-4 h-4" aria-hidden /> Clue (−{BIAYA_CLUE} poin)
         </button>
         <button type="button" onClick={nextSoal} disabled={mengambil} className="nb-btn min-h-[44px] inline-flex items-center justify-center gap-2">
-          <ArrowPathIcon className="w-4 h-4" aria-hidden /> Lewati
+          <IconReload className="w-4 h-4" aria-hidden /> Lewati
         </button>
       </form>
       <div className="min-h-[28px] mt-3" aria-live="polite">
         {feedback && (
           <p className={`flex items-center gap-1.5 text-sm font-medium ${feedback.benar ? "text-cream" : "text-danger"}`}>
-            {feedback.benar ? <CheckCircleIcon className="w-4 h-4" aria-hidden /> : <XCircleIcon className="w-4 h-4" aria-hidden />}
+            {feedback.benar ? <IconCircleCheck className="w-4 h-4" aria-hidden /> : <IconCircleX className="w-4 h-4" aria-hidden />}
             {feedback.text}
           </p>
         )}

@@ -1,20 +1,20 @@
 import { Link } from "@tanstack/react-router"
-import { WrenchScrewdriverIcon, PhotoIcon, ArrowDownTrayIcon, NewspaperIcon, PuzzlePieceIcon, SparklesIcon, MagnifyingGlassIcon, EyeIcon } from "@heroicons/react/24/outline"
+import { IconTool, IconPhoto, IconDownload, IconNews, IconPuzzle, IconSparkles, IconSearch, IconEye } from "@tabler/icons-react"
 import type { ToolDef } from "@neostudio/shared"
 
 export const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  WrenchScrewdriverIcon,
-  PhotoIcon,
-  ArrowDownTrayIcon,
-  NewspaperIcon,
-  PuzzlePieceIcon,
-  SparklesIcon,
-  MagnifyingGlassIcon,
-  EyeIcon,
+  IconTool,
+  IconPhoto,
+  IconDownload,
+  IconNews,
+  IconPuzzle,
+  IconSparkles,
+  IconSearch,
+  IconEye,
 }
 
 export function ToolCard({ tool, icon, cat }: { tool: ToolDef; icon?: React.ComponentType<{ className?: string }>; cat?: string }) {
-  const Icon = icon ?? WrenchScrewdriverIcon
+  const Icon = icon ?? IconTool
   return (
     <Link
       to="/tool/$id"

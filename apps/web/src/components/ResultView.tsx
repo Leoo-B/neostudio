@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { ArrowTopRightOnSquareIcon, ArrowDownTrayIcon, ClipboardDocumentIcon, UserCircleIcon, ClipboardIcon } from "@heroicons/react/24/outline"
+import { IconExternalLink, IconDownload, IconClipboard, IconUserCircle } from "@tabler/icons-react"
 import { useToast } from "./Toast"
 import { pickArr, pickPath, pickStr, toUrl, humanLabel, formatValue, resolvePayload, NOISE_KEYS } from "../lib/results"
 import type { ApiResponse, ToolDef } from "@neostudio/shared"
@@ -43,7 +43,7 @@ function ImageView({ tool, imageUrl }: { tool: ToolDef; imageUrl: string }) {
   return (
     <div className="nb-card p-4">
       <a href={imageUrl} download={`${tool.id}.png`} className="nb-btn inline-flex items-center gap-2 mb-4">
-        <ArrowDownTrayIcon className="w-4 h-4" /> Unduh Gambar
+        <IconDownload className="w-4 h-4" /> Unduh Gambar
       </a>
       <img src={imageUrl} alt={tool.name} className="w-full h-auto border border-line bg-black" />
     </div>
@@ -119,7 +119,7 @@ function CopyButton({ text }: { text: string }) {
       }}
       className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 border border-line hover:bg-muted transition-colors duration-150 cursor-pointer"
     >
-      <ClipboardDocumentIcon className="w-4 h-4" />
+      <IconClipboard className="w-4 h-4" />
       {copied ? "Tersalin!" : "Salin"}
     </button>
   )
@@ -180,7 +180,7 @@ function ProfileCardView({ obj, tool }: { obj: Record<string, unknown>; tool: To
         <img src={avatar} alt={name} className="w-20 h-20 sm:w-24 sm:h-24 border border-line bg-altar object-cover" />
       ) : (
         <div className="w-20 h-20 sm:w-24 sm:h-24 border border-line bg-altar grid place-items-center">
-          <UserCircleIcon className="w-10 h-10 text-muted-fg" />
+          <IconUserCircle className="w-10 h-10 text-muted-fg" />
         </div>
       )}
       <div className="flex-1 min-w-0">
@@ -189,7 +189,7 @@ function ProfileCardView({ obj, tool }: { obj: Record<string, unknown>; tool: To
         <MetaChips obj={obj} fields={tool.metaFields} />
         {link && (
           <a href={link} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm text-cream hover:underline cursor-pointer">
-            Buka profil <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+            Buka profil <IconExternalLink className="w-4 h-4" />
           </a>
         )}
       </div>
@@ -309,7 +309,7 @@ function ResultList({ items, tool, rawData }: { items: Record<string, unknown>[]
             </div>
             {link && (
               <a href={link} target="_blank" rel="noreferrer" className="nb-btn text-xs px-3 py-1.5 shrink-0 inline-flex items-center gap-1.5">
-                Buka <ArrowTopRightOnSquareIcon className="w-3.5 h-3.5" />
+                Buka <IconExternalLink className="w-3.5 h-3.5" />
               </a>
             )}
           </div>
@@ -390,14 +390,14 @@ function DownloadCard({ tool, data }: { tool: ToolDef; data: unknown }) {
         <div className="mt-5 flex flex-wrap gap-3">
           {graded.map((d) => (
             <a key={d.url} href={d.url} target="_blank" rel="noreferrer" download className="nb-btn inline-flex items-center gap-2 text-sm">
-              <ArrowDownTrayIcon className="w-4 h-4" />
+              <IconDownload className="w-4 h-4" />
               {d.label}
             </a>
           ))}
         </div>
         <div className="mt-3 flex items-center gap-3">
           <button onClick={() => copyUrl(graded[0].url)} className="text-xs border border-line px-3 py-2 hover:bg-muted transition-colors flex items-center gap-1.5 cursor-pointer">
-            <ClipboardIcon className="w-4 h-4" /> Salin Link
+            <IconClipboard className="w-4 h-4" /> Salin Link
           </button>
           {tool.fallbackToolId && (
             <span className="text-xs text-muted-fg">

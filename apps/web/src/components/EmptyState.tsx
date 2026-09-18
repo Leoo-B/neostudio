@@ -51,7 +51,7 @@ export function EmptyState({ q, onPick, onReset }: Props) {
           transition={reduced ? undefined : { duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10"
         >
-          <IconTrash stroke={1.25} className="w-16 h-16 text-muted-fg" aria-hidden />
+          <IconTrash className="w-16 h-16 text-muted-fg" aria-hidden />
         </motion.div>
 
         {/* lalat: Lottie (sayap mengepak) + orbit path irregular + jitter dart */}

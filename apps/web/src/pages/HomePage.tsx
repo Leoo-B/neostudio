@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router"
-import { ChevronRightIcon, BoltIcon, ShieldCheckIcon } from "@heroicons/react/24/outline"
+import { IconChevronRight, IconBolt, IconShieldCheck } from "@tabler/icons-react"
 import { useState } from "react"
 import { CATEGORIES, TOOLS } from "@neostudio/shared"
 import { CategoryTile } from "../components/CategoryTile"
@@ -34,7 +34,7 @@ export default function HomePage() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/tools" className="nb-btn inline-flex items-center gap-2 min-h-[44px] px-6">
-                Jelajahi Semua Tools <ChevronRightIcon className="w-4 h-4" aria-hidden />
+                Jelajahi Semua Tools <IconChevronRight className="w-4 h-4" aria-hidden />
               </Link>
               <Link to="/tools" search={{ cat: "games" }} className="nb-btn-alt inline-flex items-center gap-2 min-h-[44px] px-6">
                 Main Game
@@ -86,7 +86,7 @@ export default function HomePage() {
                 </p>
                 <span className="inline-flex items-center gap-1 text-xs text-muted-fg mt-2 group-hover:text-cream">
                   Lihat semua tools
-                  <ChevronRightIcon className="w-3.5 h-3.5" aria-hidden />
+                  <IconChevronRight className="w-3.5 h-3.5" aria-hidden />
                 </span>
               </div>
             </Link>
@@ -98,8 +98,8 @@ export default function HomePage() {
 
             {/* 2 feature tile (non-clickable, tanpa lift) */}
             {[
-              { icon: BoltIcon, title: "Cepat & ringan", desc: "Load kecil, hasil keluar hitungan detik." },
-              { icon: ShieldCheckIcon, title: "Privasi dulu", desc: "Gak ada akun, gak ada pelacakan antar tool." },
+              { icon: IconBolt, title: "Cepat & ringan", desc: "Load kecil, hasil keluar hitungan detik." },
+              { icon: IconShieldCheck, title: "Privasi dulu", desc: "Gak ada akun, gak ada pelacakan antar tool." },
             ].map((f) => (
               <div key={f.title} className="nb-card p-4 flex flex-col items-start gap-2.5">
                 <div className="shrink-0 w-9 h-9 grid place-items-center rounded-lg border border-line bg-altar">
