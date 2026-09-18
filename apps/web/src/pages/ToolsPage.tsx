@@ -1,10 +1,10 @@
 import { useMemo, useRef, useState } from "react"
-import { Link, useSearch, useRouter } from "@tanstack/react-router"
+import { useSearch, useRouter } from "@tanstack/react-router"
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline"
 import { CATEGORIES, TOOLS } from "@neostudio/shared"
 import { Header, Footer } from "../components/Layout"
 import { ToolCard, CATEGORY_ICONS } from "../components/ToolCard"
-import { Reveal } from "../components/Reveal"
+import { FilterChips, type ChipFilter } from "../components/ui/FilterChips"
 
 export default function ToolsPage() {
   const search = useSearch({ from: "/tools" })
@@ -35,7 +35,14 @@ export default function ToolsPage() {
     }
   }
 
-  const activeCat = CATEGORIES.find((c) => c.id === cat) ?? CATEGORIES[0]
+  // FilterChips: filter kategori (semua + 8 kategori), match tool
+  const filters: ChipFilter<typeof TOOLS[number]>[] = useMemo(
+    () => [
+      { id: "all", label: "Semua", match: () => true },
+      ...CATEGORIES.map((c) => ({ id: c.id, label: c.name, match: (t: typeof TOOLS[number]) => t.category === c.id })),
+    ],
+    [],
+  )
 
   return (
     <div className="min-h-dvh bg-bg" onKeyDown={onKeyDown}>
@@ -61,52 +68,33 @@ export default function ToolsPage() {
           </div>
         </div>
 
-        <div className="sticky top-16 z-20 -mx-4 px-4 py-3 bg-bg/85 backdrop-blur border-b border-line mb-6 flex flex-wrap gap-2">
-          <button type="button" onClick={() => setCat("all")} className={`nb-chip ${cat === "all" && !q ? "is-active" : ""}`}>
-            Semua
-          </button>
-          {CATEGORIES.map((c) => {
-            const Icon = CATEGORY_ICONS[c.icon] ?? CATEGORY_ICONS.WrenchScrewdriverIcon
-            return (
-              <button key={c.id} type="button" onClick={() => setCat(c.id)} className={`nb-chip ${cat === c.id && !q ? "is-active" : ""}`}>
-                <Icon className="w-4 h-4" />
-                {c.name}
-              </button>
-            )
-          })}
-        </div>
-
-        <Reveal>
-          {q ? (
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-muted-fg">
-                {results.length} hasil untuk <span className="text-cream">“{q}”</span>
-              </p>
-              <Link to="/tools" onClick={() => setQ("")} className="text-sm text-cream hover:underline">Reset</Link>
-            </div>
-          ) : cat === "all" ? (
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-muted-fg">{TOOLS.length} tools dalam {CATEGORIES.length} kategori.</p>
-            </div>
-          ) : (
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-muted-fg">{(activeCat as typeof CATEGORIES[number]).desc}</p>
-            </div>
-          )}
-        </Reveal>
-
-        {results.length === 0 ? (
-          <div className="nb-card p-10 text-center">
-            <p className="font-head text-lg">Tidak ada tool yang cocok</p>
-            <p className="text-sm text-muted-fg mt-2">Coba kata kunci lain, mis. “qr”, “tiktok”, atau “zodiak”.</p>
+        {q ? (
+          // mode pencarian: hasil text, reset di kanan
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm text-muted-fg">
+              {results.length} hasil untuk <span className="text-cream">“{q}”</span>
+            </p>
+            <button type="button" onClick={() => setQ("")} className="text-sm text-cream hover:underline">
+              Reset
+            </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {results.map((t) => {
+          // mode kategori: FilterChips sliding thumb + reflow
+          <FilterChips
+            label="Filter kategori"
+            items={TOOLS}
+            filters={filters}
+            value={cat}
+            onValueChange={setCat}
+            getKey={(t) => t.id}
+            columns={{ base: 1, sm: 2, lg: 3, xl: 4 }}
+            rowHeight={96}
+            emptyLabel="Tidak ada tool di kategori ini"
+            renderItem={(t) => {
               const c = CATEGORIES.find((x) => x.id === t.category)
-              return <ToolCard key={t.id} tool={t} icon={c ? CATEGORY_ICONS[c.icon] : undefined} cat={cat} />
-            })}
-          </div>
+              return <ToolCard tool={t} icon={c ? CATEGORY_ICONS[c.icon] : undefined} cat={cat} />
+            }}
+          />
         )}
       </main>
       <Footer />
