@@ -16,8 +16,18 @@ export function EmptyState({ q, onPick, onReset }: Props) {
   const reduced = useReducedMotion()
   const flyRef = useRef<HTMLDivElement>(null)
 
+  const dbg = (info: unknown) => {
+    ;(window as unknown as { __fly?: string[] }).__fly = [
+      ...((window as unknown as { __fly?: string[] }).__fly ?? []),
+      typeof info === "string" ? info : JSON.stringify(info),
+    ]
+  }
+  dbg("render")
+
   useEffect(() => {
+    dbg("effect")
     const el = flyRef.current
+    dbg({ el: !!el })
     if (!el) return
     let anim: ReturnType<typeof lottie.loadAnimation> | undefined
     try {
@@ -28,18 +38,12 @@ export function EmptyState({ q, onPick, onReset }: Props) {
         autoplay: true,
         animationData: flyAnim,
       })
-      ;(window as unknown as { __flyDebug?: unknown }).__flyDebug = {
-        ok: true,
-        frames: anim.totalFrames,
-        svg: el.querySelectorAll("svg").length,
-      }
+      dbg({ ok: true, frames: anim.totalFrames, svg: el.querySelectorAll("svg").length })
     } catch (e) {
-      ;(window as unknown as { __flyDebug?: unknown }).__flyDebug = {
-        ok: false,
-        err: String(e),
-      }
+      dbg({ ok: false, err: String(e) })
     }
     return () => {
+      dbg("cleanup")
       anim?.destroy()
     }
   }, [])
